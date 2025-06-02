@@ -17,14 +17,18 @@
 void Layout(Gui *ui);
 void StatusBarLayout(Gui * ui);
 void ToolBarLayout(Gui * ui);
+void NewItemWindow(Gui * ui);
 
 int gridPosX = 0;
 int gridPosY = 0;
+
+bool NewItemWindowActive = false;
 
 
 Gui * NewGUI() {
 	Gui * ui = (Gui*)malloc(sizeof(Gui));
 	flipset_init(ui->flipped);
+	itemlist_init(ui->items);
 	ui->winWidth = 640;
 	ui->winHeight = 640;
 	ui->btnHeight = 50;
@@ -39,6 +43,7 @@ Gui * NewGUI() {
 void FreeGui(Gui *ui){
 	FreeFontValue(ui->value);
 	flipset_clear(ui->flipped);
+	itemlist_clear(ui->items);
 	free(ui);
 }
 
@@ -181,13 +186,64 @@ void canvasLayout(Gui * ui) {
 
 }
 
+void ItemSelectorLayout(Gui * ui);
 
 void Layout(Gui *ui) {
+
+
+
+
+
+	
+
 	GuiPanel((Rectangle){0,0,ui->winWidth, ui->winHeight}, NULL);
 	ToolBarLayout(ui);
-	canvasLayout(ui);
+	//canvasLayout(ui);
+	//
+	ItemSelectorLayout(ui);
+	
 	StatusBarLayout(ui);
 	StatusBarLayout(ui);
+
+	if (NewItemWindowActive) {
+
+		NewItemWindow(ui);
+	}
+
+
+}
+
+#define IL_MARGIN 10
+#define IL_ANCHOR (Vector2){0,0}
+#define IL_WIDTH 200
+
+int listviewIndex = 0;
+int listActiveItem = 0;
+
+#define NEWITEM_BTN_HEIGHT 40
+
+void newItemButton(Gui * ui) {
+	if (GuiButton((Rectangle){
+		IL_ANCHOR.x + IL_MARGIN,
+		IL_ANCHOR.y + TOOLBAR_HEIGHT + IL_MARGIN,
+		IL_WIDTH,
+		NEWITEM_BTN_HEIGHT,
+	}, "New Item")) {
+		NewItemWindowActive = true;
+	}
+}
+
+void ItemSelectorLayout(Gui * ui) {
+	//GuiListViewEx(Rectangle bounds, const char **text, int count, int *scrollIndex, int *active, int *focus)
+	//
+	newItemButton(ui);
+	GuiListView((Rectangle){
+		IL_ANCHOR.x + IL_MARGIN,
+		IL_ANCHOR.y + TOOLBAR_HEIGHT + IL_MARGIN * 2 + NEWITEM_BTN_HEIGHT,
+		IL_WIDTH,
+		ui->winHeight - STATUSBAR_HEIGHT - IL_MARGIN * 3 - TOOLBAR_HEIGHT - NEWITEM_BTN_HEIGHT,
+
+	}, "APPLE;ORANGE", &listviewIndex, &listActiveItem);
 }
 
 #define TOOL_MARGIN 5
@@ -270,5 +326,47 @@ void StatusBarLayout(Gui * ui){
 		ui->winWidth, 
 		STATUSBAR_HEIGHT
 	}, TextFormat("[%d, %d] | " , gridPosX, gridPosY));
+
+}
+
+#define NW_MARGIN 30
+#define NW_ANCHOR (Vector2){0,0}
+#define NW_WIDTH 500
+#define NW_HEIGHT 200
+
+// ------------------
+//
+char hexCode[120] = "0x0";
+
+void NewItemWindow(Gui * ui) {
+
+	Vector2 winPos = (Vector2){
+		(ui->winWidth - NW_WIDTH) * 0.5f,
+		(ui->winHeight - NW_HEIGHT) * 0.5f,
+	};
+
+	NewItemWindowActive = !GuiWindowBox((Rectangle){
+		winPos.x,
+		winPos.y,
+		NW_WIDTH,
+		NW_HEIGHT,
+
+	}, "Create New Font Item");
+	GuiLabel((Rectangle){
+		winPos.x + NW_ANCHOR.x + NW_MARGIN,
+		winPos.y + NW_ANCHOR.y + NW_MARGIN,
+		200,
+		32
+	}, "Font Item Hex : ");
+
+	GuiTextBox((Rectangle){
+		winPos.x + NW_ANCHOR.x + NW_MARGIN + 200,
+		winPos.y + NW_ANCHOR.y + NW_MARGIN,
+		200,
+		32
+	}, hexCode, 120, true);
+
+
+
 
 }
