@@ -4,6 +4,7 @@
 #include "mlib/m-string.h"
 #include "mlib/m-dict.h"
 #include "fontvalue.h"
+#include "raylib.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -17,13 +18,18 @@ typedef struct Gui {
 	const char * title;
 	flipset_t flipped;
 	FontValue * value;
-	int btnHeight;
-	int btnWidth;
+	int btnSize;
 	bool enableGrid;
-	int gridGuideWidth;
+	int gridThickness;
+	Vector2 gridSize;
 	itemlist_t items;
-
-
+	float toolbarHeight;
+	float statusbarHeight;
+	Vector2 canvasAnchor;
+	Vector2 itemListAnchor;
+	float itemListWidth;
+	int itemListIndex;
+	int itemListActive;
 	
 } Gui;
 

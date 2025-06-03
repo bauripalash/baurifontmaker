@@ -13,11 +13,30 @@
 #include <stdlib.h>
 
 
+#define NW_MARGIN 30
+#define NW_WIDTH 500
+#define NW_HEIGHT 200
+
+
+#define MARGIN 20 // Canvas Margin
+
+
+#define IL_MARGIN 10
+#define NEWITEM_BTN_HEIGHT 40
+#define ITEM_CTRL_BTN_PADDING 5
+
+#define ITEM_PANEL_PADDING 10
+#define ITEM_PANEL_MARGIN 20
+
+
+#define TOOL_MARGIN 5
+
 
 void Layout(Gui *ui);
 void StatusBarLayout(Gui * ui);
 void ToolBarLayout(Gui * ui);
 void NewItemWindow(Gui * ui);
+void ItemSelectorLayout(Gui * ui);
 
 int gridPosX = 0;
 int gridPosY = 0;
@@ -25,18 +44,28 @@ int gridPosY = 0;
 bool NewItemWindowActive = false;
 
 
+char hexCode[120] = "0x0";
+
 Gui * NewGUI() {
 	Gui * ui = (Gui*)malloc(sizeof(Gui));
 	flipset_init(ui->flipped);
 	itemlist_init(ui->items);
 	ui->winWidth = 640;
 	ui->winHeight = 640;
-	ui->btnHeight = 50;
-	ui->btnWidth = 50;
+	ui->btnSize = 50;
 	ui->value = NewFontValue();
 	ui->title = TextFormat("BauriFontMaker");
 	ui->enableGrid = true;
-	ui->gridGuideWidth = 2;
+	ui->gridThickness = 2;
+	ui->toolbarHeight = 50;
+	ui->statusbarHeight = 30;
+	ui->canvasAnchor = (Vector2){.x = 0, .y = ui->toolbarHeight};
+	ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
+	ui->itemListWidth = 200;
+	ui->itemListActive = 0;
+	ui->itemListIndex = 0;
+	ui->gridSize = (Vector2){.x = 8, .y = 8};
+
 	return ui;
 }
 
@@ -51,6 +80,7 @@ void UpdateData(Gui * ui) {
 	ui->winHeight = GetScreenHeight();
 	ui->winWidth = GetScreenWidth();
 }
+
 void GuiMain(){
 	Gui * ui = NewGUI();
 	SetTraceLogLevel(LOG_WARNING);
@@ -75,53 +105,36 @@ void GuiMain(){
 	FreeGui(ui);
 }
 
-#define BWIDTH 50
-#define BHEIGHT 50
-
-#define GRID_WIDTH 8
-#define GRID_HEIGHT 8
-
-#define MARGIN 20
-#define SPACING 0
-#define GRID_THICKNESS 5
-#define GRID true
-#define STATUSBAR_HEIGHT 30
-
-#define TOOLBAR_HEIGHT 50
-
-#define CANVAS_ANCHOR (Vector2){.x = 0, .y = TOOLBAR_HEIGHT}
 
 Vector2 canvasBackground(Gui * ui){
 
-	// '- SPACING' because we dont need the last buttons spacing,
-	//
-	int W = ((SPACING + BWIDTH) * 8) - SPACING;
-	int H = ((SPACING + BHEIGHT) * 8) - SPACING;
+	int W = (ui->btnSize * 8);
+	int H = (ui->btnSize * 8);
 
-	if (GRID) {
-		W = ((SPACING + GRID_THICKNESS + BWIDTH) * 8) - SPACING;
-		H = ((SPACING + GRID_THICKNESS + BHEIGHT) * 8) - SPACING;
+	if (ui->enableGrid) {
+		W = ((ui->gridThickness + ui->btnSize) * 8);
+		H = ((ui->gridThickness + ui->btnSize) * 8);
 	}
 
 	Rectangle rect = (Rectangle){
-		MARGIN + CANVAS_ANCHOR.x,
-		MARGIN + CANVAS_ANCHOR.y,
+		MARGIN + ui->canvasAnchor.x,
+		MARGIN + ui->canvasAnchor.y,
 		W,
 		H,
 	};
 
-	if (GRID) {
-		rect.width += GRID_THICKNESS;
-		rect.height += GRID_THICKNESS;
+	if (ui->enableGrid) {
+		rect.width += ui->gridThickness;
+		rect.height += ui->gridThickness;
 	}
 
 
 	DrawRectangleRec(rect, ColorBlack);
 	
-	if (GRID) {
+	if (ui->enableGrid) {
 
-		rect.x += GRID_THICKNESS;
-		rect.y += GRID_THICKNESS;
+		rect.x += ui->gridThickness;
+		rect.y += ui->gridThickness;
 	
 	}
 
@@ -129,7 +142,6 @@ Vector2 canvasBackground(Gui * ui){
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {
-	
 	if (
 		IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && 
 		CheckCollisionPointRec(GetMousePosition(), rect)
@@ -138,8 +150,6 @@ bool isCanvasBtnClicked(Rectangle rect) {
 	}
 
 	return false;
-
-
 }
 
 bool isHoverBtn(Rectangle rect) {
@@ -149,24 +159,21 @@ bool isHoverBtn(Rectangle rect) {
 void canvasLayout(Gui * ui) {
 	Vector2 begin = canvasBackground(ui);
 
-	int BSW = BWIDTH + SPACING;
-	int BSH = BHEIGHT + SPACING;
+	int buttonSize = ui->btnSize;
 
-	if (GRID) {
-		BSW = BWIDTH + SPACING + GRID_THICKNESS;
-		BSH = BHEIGHT + SPACING + GRID_THICKNESS;
+	if (ui->enableGrid) {
+		buttonSize = ui->btnSize + ui->gridThickness;
 	}
 
-
-	for (int row = 0; row < GRID_HEIGHT; row++) {
-		for (int col = 0; col < GRID_WIDTH; col++) {
-			int X = begin.x + (col * BSW);
-			int Y = begin.y + (row * BSH);
+	for (int row = 0; row < (int)ui->gridSize.y; row++) {
+		for (int col = 0; col < (int)ui->gridSize.x; col++) {
+			int X = begin.x + (col * buttonSize);
+			int Y = begin.y + (row * buttonSize);
 			Rectangle rect = (Rectangle){
 				X, 
 				Y, 
-				BWIDTH, 
-				BHEIGHT
+				ui->btnSize, 
+				ui->btnSize,
 			};
 
 			if (isCanvasBtnClicked(rect)) {
@@ -186,23 +193,14 @@ void canvasLayout(Gui * ui) {
 
 }
 
-void ItemSelectorLayout(Gui * ui);
 
 void Layout(Gui *ui) {
-
-
-
-
-
-	
-
 	GuiPanel((Rectangle){0,0,ui->winWidth, ui->winHeight}, NULL);
 	ToolBarLayout(ui);
-	//canvasLayout(ui);
-	//
+	ui->canvasAnchor.x = 300;
+	ui->canvasAnchor.y = ui->toolbarHeight + 10;
+	canvasLayout(ui);
 	ItemSelectorLayout(ui);
-	
-	StatusBarLayout(ui);
 	StatusBarLayout(ui);
 
 	if (NewItemWindowActive) {
@@ -210,58 +208,70 @@ void Layout(Gui *ui) {
 		NewItemWindow(ui);
 	}
 
-
 }
 
-#define IL_MARGIN 10
-#define IL_ANCHOR (Vector2){0,0}
-#define IL_WIDTH 200
 
-int listviewIndex = 0;
-int listActiveItem = 0;
 
-#define NEWITEM_BTN_HEIGHT 40
-
-void newItemButton(Gui * ui) {
+void ItemCtrlBtns(Gui * ui, float x , float y, float maxWidth){
+	float widthForNewBtn = maxWidth * (2.0/3.0) - 5;
 	if (GuiButton((Rectangle){
-		IL_ANCHOR.x + IL_MARGIN,
-		IL_ANCHOR.y + TOOLBAR_HEIGHT + IL_MARGIN,
-		IL_WIDTH,
+		x,
+		y,
+		widthForNewBtn,
 		NEWITEM_BTN_HEIGHT,
-	}, "New Item")) {
+		
+	}, GuiIconText(ICON_KEY, "new"))){
 		NewItemWindowActive = true;
 	}
+
+	GuiButton((Rectangle){
+		x + widthForNewBtn + ITEM_CTRL_BTN_PADDING,
+		y,
+		maxWidth - widthForNewBtn - ITEM_CTRL_BTN_PADDING,
+		NEWITEM_BTN_HEIGHT,
+	}, GuiIconText(ICON_PENCIL_BIG, NULL));
 }
+
+
 
 void ItemSelectorLayout(Gui * ui) {
-	//GuiListViewEx(Rectangle bounds, const char **text, int count, int *scrollIndex, int *active, int *focus)
-	//
-	newItemButton(ui);
-	GuiListView((Rectangle){
-		IL_ANCHOR.x + IL_MARGIN,
-		IL_ANCHOR.y + TOOLBAR_HEIGHT + IL_MARGIN * 2 + NEWITEM_BTN_HEIGHT,
-		IL_WIDTH,
-		ui->winHeight - STATUSBAR_HEIGHT - IL_MARGIN * 3 - TOOLBAR_HEIGHT - NEWITEM_BTN_HEIGHT,
+	Rectangle ItemPanelRect = (Rectangle){
+		ui->itemListAnchor.x + ITEM_PANEL_MARGIN,
+		ui->itemListAnchor.y + ui->toolbarHeight + ITEM_PANEL_MARGIN,
+		ui->itemListWidth,
+		ui->winHeight - ui->statusbarHeight - ui->toolbarHeight - (ITEM_PANEL_MARGIN * 2)
+	};
+	GuiGroupBox((ItemPanelRect), "~items");
+	ItemCtrlBtns(ui, 
+			  ItemPanelRect.x + ITEM_PANEL_PADDING, 
+			  ItemPanelRect.y + ITEM_PANEL_PADDING, 
+			  ui->itemListWidth - ITEM_PANEL_PADDING * 2
+	);
 
-	}, "APPLE;ORANGE", &listviewIndex, &listActiveItem);
+	float btnsY = ItemPanelRect.y + ITEM_PANEL_PADDING * 2 + NEWITEM_BTN_HEIGHT;
+
+	GuiListView((Rectangle){
+		ItemPanelRect.x + ITEM_PANEL_PADDING,
+		btnsY,
+		ui->itemListWidth - (ITEM_PANEL_PADDING * 2),
+		ItemPanelRect.height - NEWITEM_BTN_HEIGHT - ITEM_PANEL_PADDING * 3
+	}, "0x0000 (A);0x1111 (B)", &ui->itemListIndex, &ui->itemListActive);
 }
 
-#define TOOL_MARGIN 5
-#define TOOLBAR_ACHOR (Vector2){.x = 0, .y = 0}
 
 void ToolBarLayout(Gui * ui){
 	GuiPanel((Rectangle){
 		0,
 		0,
 		ui->winWidth,
-		TOOLBAR_HEIGHT,
+		ui->toolbarHeight,
 	}, NULL);
 
-	int btnX = TOOLBAR_ACHOR.x + TOOL_MARGIN;
-	int btnY = TOOLBAR_ACHOR.y + TOOL_MARGIN;
+	int btnX = TOOL_MARGIN;
+	int btnY = TOOL_MARGIN;
 
 	int btnW = 80;
-	int btnH = TOOLBAR_HEIGHT - (TOOL_MARGIN * 2);
+	int btnH = ui->toolbarHeight - (TOOL_MARGIN * 2);
 
 	GuiButton((Rectangle){
 		btnX,
@@ -290,7 +300,7 @@ void ToolBarLayout(Gui * ui){
 
 	btnX += btnW + TOOL_MARGIN * 2;
 
-	DrawLine(btnX, 0, btnX, TOOLBAR_HEIGHT, GRAY);
+	DrawLine(btnX, 0, btnX, ui->toolbarHeight, GRAY);
 	btnW = 50;
 
 	btnX = ui->winWidth - TOOL_MARGIN - btnW;
@@ -313,7 +323,7 @@ void ToolBarLayout(Gui * ui){
 
 	btnX -= TOOL_MARGIN * 2;
 
-	DrawLine(btnX, 0, btnX, TOOLBAR_HEIGHT, GRAY);
+	DrawLine(btnX, 0, btnX, ui->toolbarHeight, GRAY);
 
 	
 
@@ -322,24 +332,15 @@ void ToolBarLayout(Gui * ui){
 void StatusBarLayout(Gui * ui){
 	GuiStatusBar((Rectangle){
 		0, 
-		ui->winHeight - STATUSBAR_HEIGHT, 
+		ui->winHeight - ui->statusbarHeight, 
 		ui->winWidth, 
-		STATUSBAR_HEIGHT
+		ui->statusbarHeight,
 	}, TextFormat("[%d, %d] | " , gridPosX, gridPosY));
 
 }
 
-#define NW_MARGIN 30
-#define NW_ANCHOR (Vector2){0,0}
-#define NW_WIDTH 500
-#define NW_HEIGHT 200
-
-// ------------------
-//
-char hexCode[120] = "0x0";
 
 void NewItemWindow(Gui * ui) {
-
 	Vector2 winPos = (Vector2){
 		(ui->winWidth - NW_WIDTH) * 0.5f,
 		(ui->winHeight - NW_HEIGHT) * 0.5f,
@@ -353,20 +354,17 @@ void NewItemWindow(Gui * ui) {
 
 	}, "Create New Font Item");
 	GuiLabel((Rectangle){
-		winPos.x + NW_ANCHOR.x + NW_MARGIN,
-		winPos.y + NW_ANCHOR.y + NW_MARGIN,
+		winPos.x + NW_MARGIN,
+		winPos.y + NW_MARGIN,
 		200,
 		32
 	}, "Font Item Hex : ");
 
 	GuiTextBox((Rectangle){
-		winPos.x + NW_ANCHOR.x + NW_MARGIN + 200,
-		winPos.y + NW_ANCHOR.y + NW_MARGIN,
+		winPos.x + NW_MARGIN + 200,
+		winPos.y + NW_MARGIN,
 		200,
 		32
 	}, hexCode, 120, true);
-
-
-
 
 }
