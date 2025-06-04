@@ -10,7 +10,9 @@ typedef struct FontValue {
 FontValue *NewFontValue();
 void FreeFontValue(FontValue *fv);
 uint8_t FlipFontValue(FontValue *fv, uint8_t col, uint8_t row);
-bool GetBool(FontValue *fv, uint8_t col, uint8_t row);
+bool GetBoolFontValue(FontValue *fv, uint8_t col, uint8_t row);
 void LogFontValue(FontValue *fv);
+void LogBinaryFontValue(FontValue * fv);
+uint8_t * GetFlippedIndexes(FontValue * fv, int * length);
 
 #endif

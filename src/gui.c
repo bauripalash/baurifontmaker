@@ -1,7 +1,7 @@
 #include "include/gui.h"
 #include "include/colors.h"
 #include "include/ext/raylib.h"
-#include "include/fontvalue.h"
+#include "include/fontitem.h"
 #include "include/strlist.h"
 #include <string.h>
 #define RAYGUI_IMPLEMENTATION
@@ -51,35 +51,42 @@ char hexCode[120] = "0x0";
 
 Gui *NewGUI() {
     Gui *ui = (Gui *)malloc(sizeof(Gui));
+    ui->conf = (UiConfig *)malloc(sizeof(UiConfig));
+
+    ui->conf->gridBtnSize = 50;
+    ui->conf->enableGrid = true;
+    ui->conf->gridThickness = 2;
+    ui->conf->toolbarHeight = 50;
+    ui->conf->statusbarHeight = 30;
+    ui->conf->itemListWidth = 200;
+    ui->conf->gridSize = (Vector2){.x = 8, .y = 8};
+
     flipset_init(ui->flipped);
-    itemlist_init(ui->items);
+
     ui->winWidth = 800;
     ui->winHeight = 640;
-    ui->btnSize = 50;
-    ui->value = NewFontValue();
     ui->title = TextFormat("BauriFontMaker");
-    ui->enableGrid = true;
-    ui->gridThickness = 2;
-    ui->toolbarHeight = 50;
-    ui->statusbarHeight = 30;
-    ui->canvasAnchor = (Vector2){.x = 0, .y = ui->toolbarHeight};
     ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
-    ui->itemListWidth = 200;
     ui->itemListActive = 0;
     ui->itemListIndex = 0;
-    ui->gridSize = (Vector2){.x = 8, .y = 8};
     ui->listItems = NewStrList();
+    ui->items = NewFontItemList();
+    ui->currentItem = NULL;
 
     AddStrList(ui->listItems, "0x0000 (A)");
+
+    ui->items = NewFontItemList();
+    AddToFontItemList(ui->items, NewFontItem("0x00000"));
+    ui->currentItem = ui->items->items[0];
 
     return ui;
 }
 
 void FreeGui(Gui *ui) {
-    FreeFontValue(ui->value);
     FreeStrList(ui->listItems);
+    FreeFontItemList(ui->items);
     flipset_clear(ui->flipped);
-    itemlist_clear(ui->items);
+    free(ui->conf);
     free(ui);
 }
 
@@ -122,8 +129,8 @@ void GuiMain() {
 void Layout(Gui *ui) {
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     ToolBarLayout(ui);
-    ui->canvasAnchor.x = 300;
-    ui->canvasAnchor.y = ui->toolbarHeight + 10;
+    // ui->canvasAnchor.x = 300;
+    // ui->canvasAnchor.y = ui->toolbarHeight + 10;
     canvasPanel(ui);
     ItemSelectorLayout(ui);
     StatusBarLayout(ui);
@@ -149,52 +156,66 @@ bool isHoverBtn(Rectangle rect) {
 
 void canvasLayout(Gui *ui, Rectangle panel) {
 
-    int gridW = (int)ui->gridSize.x * ui->btnSize +
-                ((int)ui->gridSize.x + 1) * ui->gridThickness;
-    int gridH = (int)ui->gridSize.y * ui->btnSize +
-                ((int)ui->gridSize.y + 1) * ui->gridThickness;
+    int gridW = (int)ui->conf->gridSize.x * ui->conf->gridBtnSize +
+                ((int)ui->conf->gridSize.x + 1) * ui->conf->gridThickness;
+    int gridH = (int)ui->conf->gridSize.y * ui->conf->gridBtnSize +
+                ((int)ui->conf->gridSize.y + 1) * ui->conf->gridThickness;
     int panelCenterX = panel.x + panel.width * 0.5f;
     int panelCenterY = panel.y + panel.height * 0.5f;
 
     int gridX = panelCenterX - gridW * 0.5f;
     int gridY = panelCenterY - gridH * 0.5f;
 
-    if (ui->enableGrid) {
+    if (ui->conf->enableGrid) {
         DrawRectangleRec((Rectangle){gridX, gridY, gridW, gridH}, ColorBlack);
     }
 
-    for (int row = 0; row < (int)ui->gridSize.y; row++) {
-        for (int col = 0; col < (int)ui->gridSize.x; col++) {
-            int btnX = (gridX + ui->gridThickness) +
-                       (col * (ui->btnSize + ui->gridThickness));
-            int btnY = (gridY + ui->gridThickness) +
-                       (row * (ui->btnSize + ui->gridThickness));
+    int btnIndex = 0;
+    for (int row = 0; row < (int)ui->conf->gridSize.y; row++) {
+        for (int col = 0; col < (int)ui->conf->gridSize.x; col++) {
+            int btnX =
+                (gridX + ui->conf->gridThickness) +
+                (col * (ui->conf->gridBtnSize + ui->conf->gridThickness));
+            int btnY =
+                (gridY + ui->conf->gridThickness) +
+                (row * (ui->conf->gridBtnSize + ui->conf->gridThickness));
 
-            Rectangle btnRect = {btnX, btnY, ui->btnSize, ui->btnSize};
+            Rectangle btnRect = {btnX, btnY, ui->conf->gridBtnSize,
+                                 ui->conf->gridBtnSize};
 
             if (isCanvasBtnClicked(btnRect)) {
                 printf("[%d,%d]\n", col, row);
+                FontItemFlipBit(ui->currentItem, col, row);
+                LogBinaryFontItem(ui->currentItem);
+                LogFontItem(ui->currentItem);
             }
 
             if (isHoverBtn(btnRect)) {
                 gridPosX = col;
                 gridPosY = row;
             }
-            DrawRectangleRec(btnRect, ColorWhite);
+            Color clr = ColorWhite;
+
+            if (FontItemGetFlip(ui->currentItem, col, row)) {
+                clr = ColorBlack;
+            }
+            DrawRectangleRec(btnRect, clr);
+            btnIndex++;
         }
     }
 }
 
 void canvasPanel(Gui *ui) {
 
-    int xpos = ui->itemListAnchor.x + ITEM_PANEL_MARGIN + ui->itemListWidth +
-               ITEM_PANEL_MARGIN + CANVAS_PANEL_MARGIN;
+    int xpos = ui->itemListAnchor.x + ITEM_PANEL_MARGIN +
+               ui->conf->itemListWidth + ITEM_PANEL_MARGIN +
+               CANVAS_PANEL_MARGIN;
 
     Rectangle canvasPanelRect =
-        (Rectangle){xpos, ui->toolbarHeight + ITEM_PANEL_MARGIN,
+        (Rectangle){xpos, ui->conf->toolbarHeight + ITEM_PANEL_MARGIN,
                     ui->winWidth - xpos - (ITEM_PANEL_MARGIN),
-                    ui->winHeight - ui->toolbarHeight - ui->statusbarHeight -
-                        ITEM_PANEL_MARGIN * 2
+                    ui->winHeight - ui->conf->toolbarHeight -
+                        ui->conf->statusbarHeight - ITEM_PANEL_MARGIN * 2
 
         };
 
@@ -231,14 +252,14 @@ int listItemFocus = 0;
 void ItemSelectorLayout(Gui *ui) {
     Rectangle ItemPanelRect = (Rectangle){
         ui->itemListAnchor.x + ITEM_PANEL_MARGIN,
-        ui->itemListAnchor.y + ui->toolbarHeight + ITEM_PANEL_MARGIN,
-        ui->itemListWidth,
-        ui->winHeight - ui->statusbarHeight - ui->toolbarHeight -
+        ui->itemListAnchor.y + ui->conf->toolbarHeight + ITEM_PANEL_MARGIN,
+        ui->conf->itemListWidth,
+        ui->winHeight - ui->conf->statusbarHeight - ui->conf->toolbarHeight -
             (ITEM_PANEL_MARGIN * 2)};
     GuiGroupBox((ItemPanelRect), "~items");
     ItemCtrlBtns(ui, ItemPanelRect.x + ITEM_PANEL_PADDING,
                  ItemPanelRect.y + ITEM_PANEL_PADDING,
-                 ui->itemListWidth - ITEM_PANEL_PADDING * 2);
+                 ui->conf->itemListWidth - ITEM_PANEL_PADDING * 2);
 
     float btnsY = ItemPanelRect.y + ITEM_PANEL_PADDING * 2 + NEWITEM_BTN_HEIGHT;
 
@@ -246,7 +267,7 @@ void ItemSelectorLayout(Gui *ui) {
         (Rectangle){
             ItemPanelRect.x + ITEM_PANEL_PADDING,
             btnsY,
-            ui->itemListWidth - (ITEM_PANEL_PADDING * 2),
+            ui->conf->itemListWidth - (ITEM_PANEL_PADDING * 2),
             ItemPanelRect.height - NEWITEM_BTN_HEIGHT - ITEM_PANEL_PADDING * 3,
         },
         ui->listItems->items, ui->listItems->len, &ui->itemListIndex,
@@ -259,7 +280,7 @@ void ToolBarLayout(Gui *ui) {
             0,
             0,
             ui->winWidth,
-            ui->toolbarHeight,
+            ui->conf->toolbarHeight,
         },
         NULL);
 
@@ -267,7 +288,7 @@ void ToolBarLayout(Gui *ui) {
     int btnY = TOOL_MARGIN;
 
     int btnW = 80;
-    int btnH = ui->toolbarHeight - (TOOL_MARGIN * 2);
+    int btnH = ui->conf->toolbarHeight - (TOOL_MARGIN * 2);
 
     GuiButton(
         (Rectangle){
@@ -302,7 +323,7 @@ void ToolBarLayout(Gui *ui) {
 
     btnX += btnW + TOOL_MARGIN * 2;
 
-    DrawLine(btnX, 0, btnX, ui->toolbarHeight, GRAY);
+    DrawLine(btnX, 0, btnX, ui->conf->toolbarHeight, GRAY);
     btnW = 50;
 
     btnX = ui->winWidth - TOOL_MARGIN - btnW;
@@ -329,16 +350,16 @@ void ToolBarLayout(Gui *ui) {
 
     btnX -= TOOL_MARGIN * 2;
 
-    DrawLine(btnX, 0, btnX, ui->toolbarHeight, GRAY);
+    DrawLine(btnX, 0, btnX, ui->conf->toolbarHeight, GRAY);
 }
 
 void StatusBarLayout(Gui *ui) {
     GuiStatusBar(
         (Rectangle){
             0,
-            ui->winHeight - ui->statusbarHeight,
+            ui->winHeight - ui->conf->statusbarHeight,
             ui->winWidth,
-            ui->statusbarHeight,
+            ui->conf->statusbarHeight,
         },
         TextFormat("[%d, %d] | ", gridPosX, gridPosY));
 }
