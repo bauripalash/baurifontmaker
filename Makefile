@@ -18,3 +18,11 @@ crun: cbuild
 csetup:
 	cmake -S . -B build
 	make cbuild
+
+.PHONY: fmt
+fmt:
+	@clang-format -i -style=file --verbose src/*.c src/include/*.h
+
+.PHONY:valgrind
+valgrind: cbuild
+	valgrind --leak-check=full --show-leak-kinds=all ./build/baurifontmaker/baurifontmaker > valgrind.log 2>&1

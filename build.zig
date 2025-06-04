@@ -32,6 +32,7 @@ pub fn build(b: *std.Build) void {
     exe.addCSourceFiles(.{ .files = &.{
         "src/gui.c",
         "src/fontvalue.c",
+        "src/strlist.c",
     } });
     exe_mod.linkLibrary(raylib_artifact);
     exe_mod.link_libc = true;

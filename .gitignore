@@ -1,6 +1,7 @@
 ##### Project #####
 build/
 .cache/
+valgrind.log
 
 ##### C.gitignore #####
 # Prerequisites
