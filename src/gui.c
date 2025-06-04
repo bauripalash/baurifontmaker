@@ -28,14 +28,22 @@
 
 #define TOOL_MARGIN 5
 
+#define CANVAS_PANEL_MARGIN 10
+
 void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
 void ToolBarLayout(Gui *ui);
 void NewItemWindow(Gui *ui);
 void ItemSelectorLayout(Gui *ui);
 
+void canvasPanel(Gui *ui);
+void canvasLayout(Gui *ui, Rectangle panel);
+
 int gridPosX = 0;
 int gridPosY = 0;
+
+int canvasWidth = 0;
+int canvasHeight = 0;
 
 bool NewItemWindowActive = false;
 
@@ -45,7 +53,7 @@ Gui *NewGUI() {
     Gui *ui = (Gui *)malloc(sizeof(Gui));
     flipset_init(ui->flipped);
     itemlist_init(ui->items);
-    ui->winWidth = 640;
+    ui->winWidth = 800;
     ui->winHeight = 640;
     ui->btnSize = 50;
     ui->value = NewFontValue();
@@ -68,7 +76,6 @@ Gui *NewGUI() {
 }
 
 void FreeGui(Gui *ui) {
-
     FreeFontValue(ui->value);
     FreeStrList(ui->listItems);
     flipset_clear(ui->flipped);
@@ -92,6 +99,7 @@ void GuiMain() {
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(ui->winWidth, ui->winHeight, ui->title);
+    SetWindowMinSize(ui->winWidth, ui->winHeight);
     GuiLoadStyleLightBFM();
 
     SetTargetFPS(60);
@@ -111,37 +119,19 @@ void GuiMain() {
     CloseWindow();
 }
 
-Vector2 canvasBackground(Gui *ui) {
+void Layout(Gui *ui) {
+    GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
+    ToolBarLayout(ui);
+    ui->canvasAnchor.x = 300;
+    ui->canvasAnchor.y = ui->toolbarHeight + 10;
+    canvasPanel(ui);
+    ItemSelectorLayout(ui);
+    StatusBarLayout(ui);
 
-    int W = (ui->btnSize * 8);
-    int H = (ui->btnSize * 8);
+    if (NewItemWindowActive) {
 
-    if (ui->enableGrid) {
-        W = ((ui->gridThickness + ui->btnSize) * 8);
-        H = ((ui->gridThickness + ui->btnSize) * 8);
+        NewItemWindow(ui);
     }
-
-    Rectangle rect = (Rectangle){
-        MARGIN + ui->canvasAnchor.x,
-        MARGIN + ui->canvasAnchor.y,
-        W,
-        H,
-    };
-
-    if (ui->enableGrid) {
-        rect.width += ui->gridThickness;
-        rect.height += ui->gridThickness;
-    }
-
-    DrawRectangleRec(rect, ColorBlack);
-
-    if (ui->enableGrid) {
-
-        rect.x += ui->gridThickness;
-        rect.y += ui->gridThickness;
-    }
-
-    return (Vector2){.x = rect.x, .y = rect.y};
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {
@@ -157,53 +147,60 @@ bool isHoverBtn(Rectangle rect) {
     return CheckCollisionPointRec(GetMousePosition(), rect);
 }
 
-void canvasLayout(Gui *ui) {
-    Vector2 begin = canvasBackground(ui);
+void canvasLayout(Gui *ui, Rectangle panel) {
 
-    int buttonSize = ui->btnSize;
+    int gridW = (int)ui->gridSize.x * ui->btnSize +
+                ((int)ui->gridSize.x + 1) * ui->gridThickness;
+    int gridH = (int)ui->gridSize.y * ui->btnSize +
+                ((int)ui->gridSize.y + 1) * ui->gridThickness;
+    int panelCenterX = panel.x + panel.width * 0.5f;
+    int panelCenterY = panel.y + panel.height * 0.5f;
+
+    int gridX = panelCenterX - gridW * 0.5f;
+    int gridY = panelCenterY - gridH * 0.5f;
 
     if (ui->enableGrid) {
-        buttonSize = ui->btnSize + ui->gridThickness;
+        DrawRectangleRec((Rectangle){gridX, gridY, gridW, gridH}, ColorBlack);
     }
 
     for (int row = 0; row < (int)ui->gridSize.y; row++) {
         for (int col = 0; col < (int)ui->gridSize.x; col++) {
-            int X = begin.x + (col * buttonSize);
-            int Y = begin.y + (row * buttonSize);
-            Rectangle rect = (Rectangle){
-                X,
-                Y,
-                ui->btnSize,
-                ui->btnSize,
-            };
+            int btnX = (gridX + ui->gridThickness) +
+                       (col * (ui->btnSize + ui->gridThickness));
+            int btnY = (gridY + ui->gridThickness) +
+                       (row * (ui->btnSize + ui->gridThickness));
 
-            if (isCanvasBtnClicked(rect)) {
+            Rectangle btnRect = {btnX, btnY, ui->btnSize, ui->btnSize};
+
+            if (isCanvasBtnClicked(btnRect)) {
                 printf("[%d,%d]\n", col, row);
             }
 
-            if (isHoverBtn(rect)) {
+            if (isHoverBtn(btnRect)) {
                 gridPosX = col;
                 gridPosY = row;
             }
-
-            DrawRectangleRec(rect, ColorWhite);
+            DrawRectangleRec(btnRect, ColorWhite);
         }
     }
 }
 
-void Layout(Gui *ui) {
-    GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
-    ToolBarLayout(ui);
-    ui->canvasAnchor.x = 300;
-    ui->canvasAnchor.y = ui->toolbarHeight + 10;
-    canvasLayout(ui);
-    ItemSelectorLayout(ui);
-    StatusBarLayout(ui);
+void canvasPanel(Gui *ui) {
 
-    if (NewItemWindowActive) {
+    int xpos = ui->itemListAnchor.x + ITEM_PANEL_MARGIN + ui->itemListWidth +
+               ITEM_PANEL_MARGIN + CANVAS_PANEL_MARGIN;
 
-        NewItemWindow(ui);
-    }
+    Rectangle canvasPanelRect =
+        (Rectangle){xpos, ui->toolbarHeight + ITEM_PANEL_MARGIN,
+                    ui->winWidth - xpos - (ITEM_PANEL_MARGIN),
+                    ui->winHeight - ui->toolbarHeight - ui->statusbarHeight -
+                        ITEM_PANEL_MARGIN * 2
+
+        };
+
+    canvasLayout(ui, canvasPanelRect);
+
+    GuiGroupBox(canvasPanelRect, "~canvas");
 }
 
 void ItemCtrlBtns(Gui *ui, float x, float y, float maxWidth) {
@@ -279,7 +276,7 @@ void ToolBarLayout(Gui *ui) {
             btnW,
             btnH,
         },
-        GuiIconText(ICON_FILE_NEW, "New"));
+        GuiIconText(ICON_FILE_NEW, "~new"));
 
     btnX += btnW + TOOL_MARGIN * 2;
 
@@ -290,7 +287,7 @@ void ToolBarLayout(Gui *ui) {
             btnW,
             btnH,
         },
-        GuiIconText(ICON_FILE_OPEN, "Open"));
+        GuiIconText(ICON_FILE_OPEN, "~open"));
 
     btnX += btnW + TOOL_MARGIN * 2;
 
@@ -301,7 +298,7 @@ void ToolBarLayout(Gui *ui) {
             btnW,
             btnH,
         },
-        GuiIconText(ICON_FILE_SAVE_CLASSIC, "Save"));
+        GuiIconText(ICON_FILE_SAVE_CLASSIC, "~save"));
 
     btnX += btnW + TOOL_MARGIN * 2;
 

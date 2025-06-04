@@ -18,6 +18,7 @@ FetchContent_MakeAvailable(raylib)
 
 add_executable(${PROJECT_NAME})
 add_subdirectory(src)
+set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 11)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
