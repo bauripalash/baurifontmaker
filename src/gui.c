@@ -2,7 +2,6 @@
 #include "include/colors.h"
 #include "include/ext/raylib.h"
 #include "include/fontitem.h"
-#include "include/strlist.h"
 #include <string.h>
 #define RAYGUI_IMPLEMENTATION
 #include "include/ext/raygui.h"
@@ -34,6 +33,8 @@ void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
 void ToolBarLayout(Gui *ui);
 void NewItemWindow(Gui *ui);
+void EditItemWindow(Gui *ui);
+
 void ItemSelectorLayout(Gui *ui);
 
 void canvasPanel(Gui *ui);
@@ -46,6 +47,7 @@ int canvasWidth = 0;
 int canvasHeight = 0;
 
 bool NewItemWindowActive = false;
+bool EditItemWindowActive = false;
 
 char hexCode[120] = "0x0";
 
@@ -69,11 +71,8 @@ Gui *NewGUI() {
     ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
     ui->itemListActive = 0;
     ui->itemListIndex = 0;
-    ui->listItems = NewStrList();
     ui->items = NewFontItemList();
     ui->currentItem = NULL;
-
-    AddStrList(ui->listItems, "0x0000 (A)");
 
     ui->items = NewFontItemList();
     AddToFontItemList(ui->items, NewFontItem("0x00000"));
@@ -83,7 +82,6 @@ Gui *NewGUI() {
 }
 
 void FreeGui(Gui *ui) {
-    FreeStrList(ui->listItems);
     FreeFontItemList(ui->items);
     flipset_clear(ui->flipped);
     free(ui->conf);
@@ -129,11 +127,13 @@ void GuiMain() {
 void Layout(Gui *ui) {
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     ToolBarLayout(ui);
-    // ui->canvasAnchor.x = 300;
-    // ui->canvasAnchor.y = ui->toolbarHeight + 10;
     canvasPanel(ui);
     ItemSelectorLayout(ui);
     StatusBarLayout(ui);
+
+    if (EditItemWindowActive) {
+        EditItemWindow(ui);
+    }
 
     if (NewItemWindowActive) {
 
@@ -238,7 +238,7 @@ void ItemCtrlBtns(Gui *ui, float x, float y, float maxWidth) {
         NewItemWindowActive = true;
     }
 
-    GuiButton(
+    bool editClicked = GuiButton(
         (Rectangle){
             x + widthForNewBtn + ITEM_CTRL_BTN_PADDING,
             y,
@@ -246,6 +246,10 @@ void ItemCtrlBtns(Gui *ui, float x, float y, float maxWidth) {
             NEWITEM_BTN_HEIGHT,
         },
         GuiIconText(ICON_PENCIL_BIG, NULL));
+
+    if (editClicked) {
+        EditItemWindowActive = true;
+    }
 }
 int listItemFocus = 0;
 
@@ -270,8 +274,11 @@ void ItemSelectorLayout(Gui *ui) {
             ui->conf->itemListWidth - (ITEM_PANEL_PADDING * 2),
             ItemPanelRect.height - NEWITEM_BTN_HEIGHT - ITEM_PANEL_PADDING * 3,
         },
-        ui->listItems->items, ui->listItems->len, &ui->itemListIndex,
+        ui->items->names, ui->items->len, &ui->itemListIndex,
         &ui->itemListActive, &listItemFocus);
+
+    // printf("selected item -> %d\n", ui->itemListActive);
+    ui->currentItem = ui->items->items[ui->itemListActive];
 }
 
 void ToolBarLayout(Gui *ui) {
@@ -364,7 +371,21 @@ void StatusBarLayout(Gui *ui) {
         TextFormat("[%d, %d] | ", gridPosX, gridPosY));
 }
 
+#define NEWWIN_BG (Color){0, 0, 0, 200}
+
+void FillScrenForPopup(Gui *ui) {
+    DrawRectangleRec(
+        (Rectangle){
+            0,
+            0,
+            ui->winWidth,
+            ui->winHeight,
+        },
+        NEWWIN_BG);
+}
+
 void NewItemWindow(Gui *ui) {
+    FillScrenForPopup(ui);
     Vector2 winPos = (Vector2){
         (ui->winWidth - NW_WIDTH) * 0.5f,
         (ui->winHeight - NW_HEIGHT) * 0.5f,
@@ -382,7 +403,46 @@ void NewItemWindow(Gui *ui) {
     GuiLabel((Rectangle){winPos.x + NW_MARGIN, winPos.y + NW_MARGIN, 200, 32},
              "Font Item Hex : ");
 
-    GuiTextBox(
+    int val = GuiTextBox(
         (Rectangle){winPos.x + NW_MARGIN + 200, winPos.y + NW_MARGIN, 200, 32},
         hexCode, 120, true);
+
+    bool createClicked = GuiButton(
+        (Rectangle){winPos.x + NW_MARGIN, winPos.y + NW_MARGIN + 100, 80, 32},
+        "Create");
+
+    bool cancelClicked =
+        GuiButton((Rectangle){winPos.x + NW_MARGIN + 80 + NW_MARGIN,
+                              winPos.y + NW_MARGIN + 100, 80, 32},
+                  "Cancel");
+
+    if (createClicked) {
+        printf("Create New Item -> %s | val -> %d\n", hexCode, val);
+        AddToFontItemList(ui->items, NewFontItem(hexCode));
+        memcpy(hexCode, "0x0", 3);
+        NewItemWindowActive = false;
+    }
+    if (cancelClicked) {
+
+        memcpy(hexCode, "0x0", 3);
+        NewItemWindowActive = false;
+    }
+}
+
+void EditItemWindow(Gui *ui) {
+    FillScrenForPopup(ui);
+    Vector2 winPos = (Vector2){
+        (ui->winWidth - NW_WIDTH) * 0.5f,
+        (ui->winHeight - NW_HEIGHT) * 0.5f,
+    };
+
+    EditItemWindowActive = !GuiWindowBox(
+        (Rectangle){
+            winPos.x,
+            winPos.y,
+            NW_WIDTH,
+            NW_HEIGHT,
+
+        },
+        TextFormat("Edit Font Item : %s", ui->currentItem->name));
 }

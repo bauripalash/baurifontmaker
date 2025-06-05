@@ -4,7 +4,7 @@
 #include "ext/mlib/m-dict.h"
 #include "ext/raylib.h"
 #include "fontitem.h"
-#include "strlist.h"
+#include "fontitemlist.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -33,7 +33,6 @@ typedef struct Gui {
     Vector2 itemListAnchor;
     int itemListIndex;
     int itemListActive;
-    StrList *listItems;
     FontItemList *items;
     FontItem *currentItem;
 

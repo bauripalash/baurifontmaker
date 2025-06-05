@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
 typedef struct {
     char *name;
     uint8_t bits[8];
@@ -20,15 +21,5 @@ bool FontItemGetFlip(FontItem *fi, uint8_t col, uint8_t row);
 uint8_t *GetFlippedIndexes(FontItem *fi, int *length);
 void LogFontItem(FontItem *fi);
 void LogBinaryFontItem(FontItem *fi);
-
-typedef struct {
-    FontItem **items;
-    size_t len;
-    size_t cap;
-} FontItemList;
-
-FontItemList *NewFontItemList();
-void FreeFontItemList(FontItemList *fl);
-void AddToFontItemList(FontItemList *fl, FontItem *item);
 
 #endif

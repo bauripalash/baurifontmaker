@@ -63,50 +63,15 @@ void LogFontItem(FontItem *fi) {
 }
 
 void LogBinaryFontItem(FontItem *fi) {
-    printf("[ ");
+    printf("[\n");
     for (int i = 0; i < 8; i++) {
 
         for (int b = 7; b >= 0; b--) {
             printf("%d", (fi->bits[i] >> b) & 1);
         }
 
-        printf(", ");
+        printf("\n");
     }
 
-    printf(" ]\n");
-}
-
-/// Font Item List Functions
-
-FontItemList *NewFontItemList() {
-    FontItemList *fl = (FontItemList *)malloc(sizeof(FontItemList));
-    fl->len = 0;
-    fl->cap = 10;
-
-    fl->items = malloc(fl->cap * sizeof(FontItem *));
-
-    return fl;
-}
-
-void resizeFontItemList(FontItemList *fl) {
-    fl->cap *= 2;
-    FontItem **items = realloc(fl->items, fl->cap * sizeof(FontItem *));
-    fl->items = items;
-}
-
-void AddToFontItemList(FontItemList *fl, FontItem *item) {
-    if (fl->len >= fl->cap) {
-        resizeFontItemList(fl);
-    }
-
-    fl->items[fl->len++] = item;
-}
-
-void FreeFontItemList(FontItemList *fl) {
-    for (size_t i = 0; i < fl->len; i++) {
-        FreeFontItem(fl->items[i]);
-    }
-
-    free(fl->items);
-    free(fl);
+    printf("]\n");
 }
