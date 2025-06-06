@@ -5,6 +5,9 @@
 #include "ext/raylib.h"
 #include "fontitem.h"
 #include "fontitemlist.h"
+#include "toolbar.h"
+#include "windows/edititem.h"
+#include "windows/newitem.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -21,6 +24,12 @@ typedef struct {
     float statusbarHeight;
 
     float itemListWidth;
+    bool isPopupActive;
+
+    ToolbarState toolbarState;
+
+    NewItemWindowState newItemWindowState;
+    EditItemWindowState editItemWindowState;
 
 } UiConfig;
 

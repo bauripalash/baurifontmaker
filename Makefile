@@ -21,7 +21,7 @@ csetup:
 
 .PHONY: fmt
 fmt:
-	@clang-format -i -style=file --verbose src/*.c src/include/*.h
+	@clang-format -i -style=file --verbose src/*.c src/windows/*.c src/include/*.h src/include/windows/*.h
 
 .PHONY:valgrind
 valgrind: cbuild
