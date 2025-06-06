@@ -4,7 +4,7 @@
 #include "ext/raylib.h"
 #include <stdbool.h>
 
-#define TOOL_MARGIN 5
+#define TOOL_MARGIN  5
 #define BUTTON_WIDTH 80
 
 typedef struct {

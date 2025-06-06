@@ -28,8 +28,10 @@ void SetToolnarHeight(ToolbarState *state, int height) {
 void Toolbar(ToolbarState *state) {
     state->bounds.width = GetScreenWidth();
     GuiPanel(state->bounds, NULL);
-    Rectangle btnBound = {TOOL_MARGIN, TOOL_MARGIN, BUTTON_WIDTH,
-                          state->bounds.height - (TOOL_MARGIN * 2)};
+    Rectangle btnBound = {
+        TOOL_MARGIN, TOOL_MARGIN, BUTTON_WIDTH,
+        state->bounds.height - (TOOL_MARGIN * 2)
+    };
 
     int leftIncrement = btnBound.width + (TOOL_MARGIN * 2);
 

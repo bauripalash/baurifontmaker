@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #define MAX_STRING_LEN 20
-#define MAX_ITEMS 255
+#define MAX_ITEMS      255
 #define INIT_ITEMS_LEN 10
 
 typedef struct {

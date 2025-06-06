@@ -14,13 +14,14 @@ EditItemWindowState CreateEditItemWindow() {
     return state;
 }
 
-bool EditItemWindow(EditItemWindowState *state) {
+bool EditItemWindow(EditItemWindowState *state, FontItem *target) {
     int winPosX = state->windowBounds.x;
     int winPosY = state->windowBounds.y;
 
     if (state->windowActive) {
         state->windowActive = !GuiWindowBox(
-            state->windowBounds, TextFormat("Edit Font Item : %s", "<TODO>"));
+            state->windowBounds, TextFormat("Edit Font Item : %s", target->name)
+        );
     }
 
     return false;

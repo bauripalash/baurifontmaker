@@ -2,6 +2,8 @@
 #include "include/colors.h"
 #include "include/ext/raylib.h"
 #include "include/fontitem.h"
+#include "include/fontitemlist.h"
+#include "include/itemselector.h"
 #include "include/toolbar.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
@@ -15,22 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NW_MARGIN 30
-#define NW_WIDTH 500
-#define NW_HEIGHT 200
-
-#define MARGIN 20 // Canvas Margin
-
-#define IL_MARGIN 10
-#define NEWITEM_BTN_HEIGHT 40
-#define ITEM_CTRL_BTN_PADDING 5
-
-#define ITEM_PANEL_PADDING 10
-#define ITEM_PANEL_MARGIN 20
+#define MARGIN              20 // Canvas Margin
 
 #define CANVAS_PANEL_MARGIN 10
 
-#define NEWWIN_BG (Color){0, 0, 0, 200}
+#define NEWWIN_BG           (Color){0, 0, 0, 200}
 
 void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
@@ -66,8 +57,6 @@ Gui *NewGUI() {
     ui->winHeight = 640;
     ui->title = TextFormat("BauriFontMaker");
     ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
-    ui->itemListActive = 0;
-    ui->itemListIndex = 0;
     ui->items = NewFontItemList();
     ui->currentItem = NULL;
 
@@ -109,6 +98,10 @@ void GuiMain() {
     ui->conf->newItemWindowState = CreateNewItemWindow();
     ui->conf->editItemWindowState = CreateEditItemWindow();
     ui->conf->toolbarState = CreateToolbar(ui->conf->toolbarHeight);
+    ui->conf->itemSelectorState = CreateItemSelector(
+        ui->conf->itemListWidth, ui->conf->toolbarHeight,
+        ui->conf->statusbarHeight
+    );
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -133,15 +126,47 @@ void FillScrenForPopup(Gui *ui) {
             ui->winWidth,
             ui->winHeight,
         },
-        NEWWIN_BG);
+        NEWWIN_BG
+    );
 }
+
+void handleNewItemWindow(Gui *ui) {
+    if (ui->conf->itemSelectorState.newBtnClicked) {
+        ui->conf->newItemWindowState.windowActive = true;
+    }
+    if (NewItemWindow(&ui->conf->newItemWindowState)) {
+        AddToFontItemList(
+            ui->items, NewFontItem(ui->conf->newItemWindowState.hexCode)
+        );
+    }
+}
+
+void handleEditItemWindow(Gui *ui) {
+    if (ui->conf->itemSelectorState.editBtnClicked) {
+        ui->conf->editItemWindowState.windowActive = true;
+    }
+
+    if (EditItemWindow(&ui->conf->editItemWindowState, ui->currentItem)) {
+        printf("Shoud Create Edit Window\n");
+    }
+}
+
+void handleItemSelector(Gui *ui) {
+
+    ui->currentItem = ui->items->items[ui->conf->itemSelectorState.active];
+}
+
+void newFileDialog(Gui *ui) {}
 
 void Layout(Gui *ui) {
 
-    ui->conf->isPopupActive = (ui->conf->newItemWindowState.windowActive ||
-                               ui->conf->editItemWindowState.windowActive);
+    ui->conf->isPopupActive =
+        (ui->conf->newItemWindowState.windowActive ||
+         ui->conf->editItemWindowState.windowActive);
 
     if (ui->conf->isPopupActive) {
+
+        GuiLock();
         FillScrenForPopup(ui);
         // TODO: Do something about ignoring inputs
     }
@@ -149,19 +174,22 @@ void Layout(Gui *ui) {
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->conf->toolbarState);
     canvasPanel(ui);
-    ItemSelectorLayout(ui);
+    ItemSelector(
+        &ui->conf->itemSelectorState, ui->items->names, ui->items->len
+    );
+    handleItemSelector(ui);
     StatusBarLayout(ui);
 
-    if (NewItemWindow(&ui->conf->newItemWindowState)) {
-        printf("Should Create New Window\n");
-    }
+    GuiUnlock();
 
-    if (EditItemWindow(&ui->conf->editItemWindowState)) {
-        printf("Shoud Create Edit Window\n");
-    }
+    handleNewItemWindow(ui);
+    handleEditItemWindow(ui);
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {
+    if (GuiIsLocked()) {
+        return false;
+    }
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
         CheckCollisionPointRec(GetMousePosition(), rect)) {
         return true;
@@ -171,6 +199,9 @@ bool isCanvasBtnClicked(Rectangle rect) {
 }
 
 bool isHoverBtn(Rectangle rect) {
+    if (GuiIsLocked()) {
+        return false;
+    }
     return CheckCollisionPointRec(GetMousePosition(), rect);
 }
 
@@ -200,8 +231,9 @@ void canvasLayout(Gui *ui, Rectangle panel) {
                 (gridY + ui->conf->gridThickness) +
                 (row * (ui->conf->gridBtnSize + ui->conf->gridThickness));
 
-            Rectangle btnRect = {btnX, btnY, ui->conf->gridBtnSize,
-                                 ui->conf->gridBtnSize};
+            Rectangle btnRect = {
+                btnX, btnY, ui->conf->gridBtnSize, ui->conf->gridBtnSize
+            };
 
             if (isCanvasBtnClicked(btnRect)) {
                 printf("[%d,%d]\n", col, row);
@@ -244,69 +276,6 @@ void canvasPanel(Gui *ui) {
     GuiGroupBox(canvasPanelRect, "~canvas");
 }
 
-void ItemCtrlBtns(Gui *ui, float x, float y, float maxWidth) {
-    float widthForNewBtn = maxWidth * (2.0 / 3.0) - 5;
-    if (GuiButton(
-            (Rectangle){
-                x,
-                y,
-                widthForNewBtn,
-                NEWITEM_BTN_HEIGHT,
-
-            },
-            GuiIconText(ICON_KEY, "new"))) {
-        ui->conf->newItemWindowState.windowActive = true;
-    }
-
-    bool editClicked = GuiButton(
-        (Rectangle){
-            x + widthForNewBtn + ITEM_CTRL_BTN_PADDING,
-            y,
-            maxWidth - widthForNewBtn - ITEM_CTRL_BTN_PADDING,
-            NEWITEM_BTN_HEIGHT,
-        },
-        GuiIconText(ICON_PENCIL_BIG, NULL));
-
-    if (editClicked) {
-        ui->conf->editItemWindowState.windowActive = true;
-    }
-}
-int listItemFocus = 0;
-
-void ItemSelectorLayout(Gui *ui) {
-    Rectangle ItemPanelRect = (Rectangle){
-        ui->itemListAnchor.x + ITEM_PANEL_MARGIN,
-        ui->itemListAnchor.y + ui->conf->toolbarHeight + ITEM_PANEL_MARGIN,
-        ui->conf->itemListWidth,
-        ui->winHeight - ui->conf->statusbarHeight - ui->conf->toolbarHeight -
-            (ITEM_PANEL_MARGIN * 2)};
-    GuiGroupBox((ItemPanelRect), "~items");
-    ItemCtrlBtns(ui, ItemPanelRect.x + ITEM_PANEL_PADDING,
-                 ItemPanelRect.y + ITEM_PANEL_PADDING,
-                 ui->conf->itemListWidth - ITEM_PANEL_PADDING * 2);
-
-    float btnsY = ItemPanelRect.y + ITEM_PANEL_PADDING * 2 + NEWITEM_BTN_HEIGHT;
-
-    GuiListViewEx(
-        (Rectangle){
-            ItemPanelRect.x + ITEM_PANEL_PADDING,
-            btnsY,
-            ui->conf->itemListWidth - (ITEM_PANEL_PADDING * 2),
-            ItemPanelRect.height - NEWITEM_BTN_HEIGHT - ITEM_PANEL_PADDING * 3,
-        },
-        ui->items->names, ui->items->len, &ui->itemListIndex,
-        &ui->itemListActive, &listItemFocus);
-
-    printf("Item Panel [Idx: %d | Actv: %d | Fcs: %d]\n", ui->itemListIndex,
-           ui->itemListActive, listItemFocus);
-
-    // printf("selected item -> %d\n", ui->itemListActive);
-    if (ui->itemListActive < 0) {
-        ui->itemListActive = 0;
-    }
-    ui->currentItem = ui->items->items[ui->itemListActive];
-}
-
 void StatusBarLayout(Gui *ui) {
     GuiStatusBar(
         (Rectangle){
@@ -315,5 +284,6 @@ void StatusBarLayout(Gui *ui) {
             ui->winWidth,
             ui->conf->statusbarHeight,
         },
-        TextFormat("[%d, %d] | ", gridPosX, gridPosY));
+        TextFormat("[%d, %d] | ", gridPosX, gridPosY)
+    );
 }

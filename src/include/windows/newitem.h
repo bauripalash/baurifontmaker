@@ -7,13 +7,14 @@
 #include <stdbool.h>
 
 #define NW_MARGIN 30
-#define NW_WIDTH 500
+#define NW_WIDTH  500
 #define NW_HEIGHT 200
 
 typedef struct {
     bool windowActive;
     Rectangle windowBounds;
     char hexCode[128];
+    char itemName[128];
 
 } NewItemWindowState;
 

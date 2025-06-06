@@ -13,8 +13,10 @@ StrList *NewStrList() {
     list->items = calloc(list->cap, sizeof(char *));
 
     if (!list->items) {
-        fprintf(stderr,
-                "Failed to Create New String List; Memory Allocation Failed\n");
+        fprintf(
+            stderr,
+            "Failed to Create New String List; Memory Allocation Failed\n"
+        );
         exit(EXIT_FAILURE);
     }
 
@@ -55,9 +57,10 @@ int AddStrList(StrList *l, const char *item) {
 
 void AddAtStrList(StrList *l, const char *value, size_t index) {
     if (index > l->len) {
-        fprintf(stderr,
-                "Index is bigger than list size; Index: %zu, Length: %zu",
-                index, l->len);
+        fprintf(
+            stderr, "Index is bigger than list size; Index: %zu, Length: %zu",
+            index, l->len
+        );
         return;
     }
 
@@ -84,13 +87,16 @@ void moveString(StrList *l, size_t oIndex, size_t nIndex) {
         fprintf(
             stderr,
             "Index is greater than list length; Index : %zu, Length : %zu\n",
-            oIndex, l->len);
+            oIndex, l->len
+        );
         return;
     }
 
     if (nIndex > l->len) {
-        fprintf(stderr, "Invalid new index; Index : %zu, Length : %zu\n",
-                nIndex, l->len);
+        fprintf(
+            stderr, "Invalid new index; Index : %zu, Length : %zu\n", nIndex,
+            l->len
+        );
         return;
     }
 
@@ -117,8 +123,9 @@ void moveString(StrList *l, size_t oIndex, size_t nIndex) {
 
 void RemoveIndexStrList(StrList *l, size_t index) {
     if (index >= l->len) {
-        fprintf(stderr, "Invalid Index; Index: %zu. Length: %zu", index,
-                l->len);
+        fprintf(
+            stderr, "Invalid Index; Index: %zu. Length: %zu", index, l->len
+        );
         return;
     }
 

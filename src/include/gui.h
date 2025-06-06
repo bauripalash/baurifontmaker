@@ -5,6 +5,7 @@
 #include "ext/raylib.h"
 #include "fontitem.h"
 #include "fontitemlist.h"
+#include "itemselector.h"
 #include "toolbar.h"
 #include "windows/edititem.h"
 #include "windows/newitem.h"
@@ -28,6 +29,8 @@ typedef struct {
 
     ToolbarState toolbarState;
 
+    ItemSelectorState itemSelectorState;
+
     NewItemWindowState newItemWindowState;
     EditItemWindowState editItemWindowState;
 
@@ -40,8 +43,6 @@ typedef struct Gui {
     UiConfig *conf;
     flipset_t flipped;
     Vector2 itemListAnchor;
-    int itemListIndex;
-    int itemListActive;
     FontItemList *items;
     FontItem *currentItem;
 

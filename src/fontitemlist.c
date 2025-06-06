@@ -56,15 +56,22 @@ void MoveFontItemList(FontItemList *fl, size_t from, size_t to) {
     const char *tempName = fl->names[from];
 
     if (from < to) {
-        memmove(&fl->items[from], &fl->items[from + 1],
-                (to - from) * sizeof(FontItem *));
-        memmove(&fl->names[from], &fl->items[from + 1],
-                (to - from) * sizeof(FontItem *));
+        memmove(
+            &fl->items[from], &fl->items[from + 1],
+            (to - from) * sizeof(FontItem *)
+        );
+        memmove(
+            &fl->names[from], &fl->items[from + 1],
+            (to - from) * sizeof(FontItem *)
+        );
     } else { // from > to
-        memmove(&fl->items[to + 1], &fl->items[to],
-                (from - to) * sizeof(FontItem *));
-        memmove(&fl->names[to + 1], &fl->names[to],
-                (from - to) * sizeof(const char *));
+        memmove(
+            &fl->items[to + 1], &fl->items[to], (from - to) * sizeof(FontItem *)
+        );
+        memmove(
+            &fl->names[to + 1], &fl->names[to],
+            (from - to) * sizeof(const char *)
+        );
     }
 
     fl->items[to] = tempItem;

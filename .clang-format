@@ -1,7 +1,7 @@
 ---
 Language:        Cpp
 AccessModifierOffset: -2
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
 AlignArrayOfStructures: None
 AlignConsecutiveAssignments:
   Enabled:         false
@@ -25,8 +25,8 @@ AlignConsecutiveDeclarations:
   AlignFunctionPointers: false
   PadOperators:    false
 AlignConsecutiveMacros:
-  Enabled:         false
-  AcrossEmptyLines: false
+  Enabled:         true
+  AcrossEmptyLines: true
   AcrossComments:  false
   AlignCompound:   false
   AlignFunctionPointers: false
