@@ -1,6 +1,7 @@
 #include "include/gui.h"
 #include "include/colors.h"
 #include "include/ext/raylib.h"
+#include "include/filedialog.h"
 #include "include/fontitem.h"
 #include "include/fontitemlist.h"
 #include "include/itemselector.h"
@@ -59,6 +60,9 @@ Gui *NewGUI() {
     ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
     ui->items = NewFontItemList();
     ui->currentItem = NULL;
+
+    strcpy(ui->openFilename, "");
+    strcpy(ui->saveFilename, "");
 
     ui->items = NewFontItemList();
     AddToFontItemList(ui->items, NewFontItem("0x00000"));
@@ -184,6 +188,18 @@ void Layout(Gui *ui) {
 
     handleNewItemWindow(ui);
     handleEditItemWindow(ui);
+
+    if (ui->conf->toolbarState.openBtnClicked) {
+        bool ok = OpenFileDialog(
+            "Open Font File", ui->openFilename, "*.bfont;*.baufnt;*.txt",
+            "BauriFontMaker Font Files (*.bfont)"
+        );
+
+        if (ok) {
+            printf("Open File -> %s\n", ui->openFilename);
+        }
+    }
+
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {

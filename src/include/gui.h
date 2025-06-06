@@ -41,6 +41,10 @@ typedef struct Gui {
     int winHeight;
     const char *title;
     UiConfig *conf;
+
+    char openFilename[512];
+    char saveFilename[512];
+
     flipset_t flipped;
     Vector2 itemListAnchor;
     FontItemList *items;
