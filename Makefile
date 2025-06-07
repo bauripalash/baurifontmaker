@@ -1,3 +1,7 @@
+BIN:=baurifontmaker
+CMAKE_OUTPUT:=build/$(BIN)/$(BIN)
+ZIG_OUTPUT:=zig-out/bin/$(BIN)
+
 .PHONY: zbuild
 zbuild:
 	zig build
@@ -12,7 +16,7 @@ cbuild:
 
 .PHONY: crun
 crun: cbuild
-	./build/baurifontmaker/baurifontmaker
+	./$(CMAKE_OUTPUT)
 
 .PHONY: csetup
 csetup:
@@ -25,4 +29,8 @@ fmt:
 
 .PHONY:valgrind
 valgrind: cbuild
-	valgrind --leak-check=full --show-leak-kinds=all ./build/baurifontmaker/baurifontmaker > valgrind.log 2>&1
+	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(CMAKE_OUTPUT) > valgrind.log 2>&1
+
+.PHONY:valgrind_z
+valgrind_z: zbuild
+	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(ZIG_OUTPUT) > valgrind.log 2>&1

@@ -28,16 +28,31 @@ pub fn build(b: *std.Build) void {
         exe.use_lld = false;
     }
 
+    if (target.result.os.tag == .windows) {
+        exe_mod.addCMacro("BFM_OS_WIN", "");
+        //exe_mod.addCMacro("UNICODE", "");
+        //exe_mod.addCMacro("_UNICODE", "");
+        exe_mod.linkSystemLibrary("comdlg32", .{});
+        exe_mod.linkSystemLibrary("ole32", .{});
+    } else if (target.result.os.tag == .linux) {
+        exe_mod.addCMacro("BFM_OS_LINUX", "");
+    } else if (target.result.os.tag == .macos) {
+        exe_mod.addCMacro("BFM_OS_WIN", "");
+    }
+
     exe.addIncludePath(b.path("src/include/"));
+    exe.addIncludePath(b.path("src/include/ext/tinyfiledialogs/"));
 
     exe.addCSourceFiles(.{
         .files = &.{
-            "src/filedialog.c",
             "src/fontitem.c",
             "src/fontitemlist.c",
             "src/gui.c",
             "src/itemselector.c",
             "src/toolbar.c",
+            "src/utils.c",
+
+            "src/filedialog.c",
 
             "src/windows/edititem.c",
             "src/windows/newitem.c",
@@ -45,6 +60,7 @@ pub fn build(b: *std.Build) void {
             //external
             "src/include/ext/tinyfiledialogs/tinyfiledialogs.c",
         },
+        .flags = &.{"-g3"},
     });
 
     exe_mod.linkLibrary(raylib_artifact);

@@ -1,6 +1,5 @@
 #include "../include/windows/newitem.h"
 #include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
 
 NewItemWindowState CreateNewItemWindow() {
@@ -101,7 +100,8 @@ bool NewItemWindow(NewItemWindowState *state) {
             const char *title =
                 GuiIconText(ICON_WARNING, "Error Creating Font Item");
             state->errWinX = (GetScreenWidth() - NW_ERR_WIDTH) * 0.5f;
-            state->errWinY = (GetScreenHeight() - NW_ERR_HEIGHT) * 0.5f;
+            state->errWinY = state->windowBounds.y +
+                             20; //(GetScreenHeight() - NW_ERR_HEIGHT) * 0.5f;
             int val = GuiMessageBox(
                 (Rectangle){
                     state->errWinX,

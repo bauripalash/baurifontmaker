@@ -1,9 +1,10 @@
-#include "include/filedialog.h"
-#include "include/ext/raylib.h"
-#include "include/ext/tinyfiledialogs/tinyfiledialogs.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "include/ext/raylib.h"
+#include "include/ext/tinyfiledialogs/tinyfiledialogs.h"
+#include "include/filedialog.h"
 
 bool OpenFileDialog(
     const char *title, char *filename, const char *filters, const char *msg

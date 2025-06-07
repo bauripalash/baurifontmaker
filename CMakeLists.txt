@@ -20,6 +20,22 @@ add_executable(${PROJECT_NAME})
 add_subdirectory(src)
 set_property(TARGET ${PROJECT_NAME} PROPERTY C_STANDARD 11)
 
+
+if (WIN32 OR MINGW OR MSYS OR CYGWIN) 
+	add_compile_definitions(BFM_OS_WIN)
+endif()
+
+if (UNIX AND NOT APPLE AND NOT CYGWIN)
+	add_compile_definitions(BFM_OS_LINUX)
+endif()
+
+if (APPLE) 
+	add_compile_definitions(BFM_OS_MAC)
+endif()
+
+
+# ====== Raylib & Raygui Stuff ======
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
@@ -47,6 +63,7 @@ if ("${PLATFORM}" STREQUAL "Web")
     # Tell Emscripten to build an example.html file.
     set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
     target_link_options(${PROJECT_NAME} PUBLIC -sUSE_GLFW=3 PUBLIC --preload-file resources)
+	add_compile_definitions(BFM_OS_WEB)
 endif()
 
 # Checks if OSX and links appropriate frameworks (Only required on MacOS)

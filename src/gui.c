@@ -6,6 +6,7 @@
 #include "include/fontitemlist.h"
 #include "include/itemselector.h"
 #include "include/toolbar.h"
+#include "include/utils.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
 #include <string.h>
@@ -86,6 +87,7 @@ void FreeStyles() {
 }
 
 void GuiMain() {
+
     Gui *ui = NewGUI();
     SetTraceLogLevel(LOG_WARNING);
 
@@ -104,6 +106,10 @@ void GuiMain() {
         ui->conf->statusbarHeight
     );
 
+    TraceLog(
+        LOG_WARNING, "OS CHECK -> WIN[%d] | LINUX[%d] | MAC[%d] | WEB[%d]",
+        IsWin(), IsLinux(), IsMac(), IsWeb()
+    );
     while (!WindowShouldClose()) {
         BeginDrawing();
         {
