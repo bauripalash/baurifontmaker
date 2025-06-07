@@ -2,6 +2,7 @@
 #include "include/ext/raygui.h"
 #include "include/ext/raylib.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
 #define NEW_BTN_ID  0
@@ -14,6 +15,7 @@ ItemSelectorState CreateItemSelector(int width, int topSkip, int bottomSkip) {
         .topSkip = topSkip + ITEM_PANEL_MARGIN,
         .bottomSkip = bottomSkip + ITEM_PANEL_MARGIN,
         .lastActive = 0,
+        .lastFocus = 0,
         .active = 0,
         .index = 0,
         .focus = 0,
@@ -72,7 +74,12 @@ void ItemSelector(ItemSelectorState *state, const char **names, int len) {
         names, len, &state->index, &state->active, &state->focus
 
     );
+
     if (state->active < 0) {
         state->active = state->lastActive;
+    }
+
+    if (state->focus < 0) {
+        state->focus = state->active;
     }
 }

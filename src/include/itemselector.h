@@ -15,6 +15,7 @@ typedef struct {
     int width;
 
     int lastActive;
+    int lastFocus;
     int active;
     int index;
     int focus;

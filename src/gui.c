@@ -160,6 +160,7 @@ void handleItemSelector(Gui *ui) {
 void newFileDialog(Gui *ui) {}
 
 void Layout(Gui *ui) {
+    GuiEnableTooltip();
 
     ui->conf->isPopupActive =
         (ui->conf->newItemWindowState.windowActive ||
@@ -269,6 +270,8 @@ void canvasLayout(Gui *ui, Rectangle panel) {
     }
 }
 
+char cc[128] = {0};
+
 void canvasPanel(Gui *ui) {
 
     int xpos = ui->itemListAnchor.x + ITEM_PANEL_MARGIN +
@@ -289,6 +292,8 @@ void canvasPanel(Gui *ui) {
 }
 
 void StatusBarLayout(Gui *ui) {
+    int hoverIndex = ui->conf->itemSelectorState.focus;
+    FontItem *hoveredFontItem = ui->items->items[hoverIndex];
     GuiStatusBar(
         (Rectangle){
             0,
@@ -296,6 +301,8 @@ void StatusBarLayout(Gui *ui) {
             ui->winWidth,
             ui->conf->statusbarHeight,
         },
-        TextFormat("[%d, %d] | ", gridPosX, gridPosY)
+        TextFormat(
+            "[%d, %d] | %d", gridPosX, gridPosY, hoveredFontItem->nameValue
+        )
     );
 }
