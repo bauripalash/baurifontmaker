@@ -1,6 +1,9 @@
-#include "../include/windows/newitem.h"
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include "../include/utils.h"
+#include "../include/windows/newitem.h"
 
 NewItemWindowState CreateNewItemWindow() {
     NewItemWindowState state = {};
@@ -12,8 +15,9 @@ NewItemWindowState CreateNewItemWindow() {
         NW_HEIGHT,
     };
 
-    strcpy(state.hexCode, "");
-    strcpy(state.itemName, "");
+    strcpy(state.hexStr, "");
+    strcpy(state.nameStr, "");
+    state.hexValue = 0;
     state.hexEditMode = false;
     state.nameEditMode = false;
     state.invalidHexError = false;
@@ -25,8 +29,8 @@ NewItemWindowState CreateNewItemWindow() {
 }
 
 void CleanNewItemState(NewItemWindowState *state) {
-    strcpy(state->hexCode, "");
-    strcpy(state->itemName, "");
+    strcpy(state->hexStr, "");
+    strcpy(state->nameStr, "");
 }
 
 bool NewItemWindow(NewItemWindowState *state) {
@@ -50,7 +54,7 @@ bool NewItemWindow(NewItemWindowState *state) {
 
         if (GuiTextBox(
                 (Rectangle){winPosX + NW_MARGIN + 200, y, 200, 32},
-                state->hexCode, MAX_HEXCODE, state->hexEditMode
+                state->hexStr, MAX_HEXCODE, state->hexEditMode
             )) {
             state->hexEditMode = !state->hexEditMode;
         }
@@ -67,7 +71,7 @@ bool NewItemWindow(NewItemWindowState *state) {
                     200,
                     32,
                 },
-                state->itemName, MAX_NAME, state->nameEditMode
+                state->nameStr, MAX_NAME, state->nameEditMode
             )) {
             state->nameEditMode = !state->nameEditMode;
         }
@@ -84,9 +88,19 @@ bool NewItemWindow(NewItemWindowState *state) {
         );
 
         if (createClicked) {
-            if (!TextIsEqual(state->hexCode, "0x01")) {
+            if (!IsValidHex(state->hexStr)) {
                 state->invalidHexError = true;
             } else {
+                if (TextLength(state->nameStr) <= 0) {
+                    TextCopy(state->nameStr, state->hexStr);
+                }
+                int hexBase = 16;
+                if (strlen(state->hexStr) > 2 &&
+                    (state->hexStr[0] == '0' &&
+                     (state->hexStr[1] == 'x' || state->hexStr[1] == 'X'))) {
+                    hexBase = 0;
+                }
+                state->hexValue = (int)strtol(state->hexStr, NULL, hexBase);
                 state->windowActive = false;
                 return true;
             }

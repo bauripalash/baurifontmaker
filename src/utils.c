@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 bool IsValidHex(const char *str) {
@@ -17,7 +18,7 @@ bool IsValidHex(const char *str) {
         startIndex = 2;
     }
 
-    for (size_t i = 0; i < inputLen; i++) {
+    for (size_t i = startIndex; i < inputLen; i++) {
         if (!isxdigit(str[i])) {
             return false;
         }

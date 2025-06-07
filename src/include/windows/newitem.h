@@ -21,8 +21,9 @@ typedef struct {
     Rectangle windowBounds;
     int errWinX;
     int errWinY;
-    char hexCode[MAX_HEXCODE + 1];
-    char itemName[MAX_NAME + 1];
+    char hexStr[MAX_HEXCODE + 1];
+    char nameStr[MAX_NAME + 1];
+    int hexValue;
     bool hexEditMode;
     bool nameEditMode;
 

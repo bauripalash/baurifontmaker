@@ -64,7 +64,9 @@ Gui *NewGUI() {
     strcpy(ui->saveFilename, "");
 
     ui->items = NewFontItemList();
-    AddToFontItemList(ui->items, NewFontItem("0x00000"));
+    FontItem *tempItem = NewFontItem("0x00000");
+    SetNameValue(tempItem, 0);
+    AddToFontItemList(ui->items, tempItem);
     ui->currentItem = ui->items->items[0];
 
     return ui;
@@ -142,9 +144,10 @@ void handleNewItemWindow(Gui *ui) {
         ui->conf->newItemWindowState.windowActive = true;
     }
     if (NewItemWindow(&ui->conf->newItemWindowState)) {
-        AddToFontItemList(
-            ui->items, NewFontItem(ui->conf->newItemWindowState.hexCode)
-        );
+
+        FontItem *tempItem = NewFontItem(ui->conf->newItemWindowState.nameStr);
+        SetNameValue(tempItem, ui->conf->newItemWindowState.hexValue);
+        AddToFontItemList(ui->items, tempItem);
     }
 }
 
@@ -308,7 +311,8 @@ void StatusBarLayout(Gui *ui) {
             ui->conf->statusbarHeight,
         },
         TextFormat(
-            "[%d, %d] | %d", gridPosX, gridPosY, hoveredFontItem->nameValue
+            "[%d, %d] | %s (%d)", gridPosX, gridPosY, hoveredFontItem->name,
+            hoveredFontItem->nameValue
         )
     );
 }
