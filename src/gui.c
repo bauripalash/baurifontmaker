@@ -52,8 +52,6 @@ Gui *NewGUI() {
     ui->conf->gridSize = (Vector2){.x = 8, .y = 8};
     ui->conf->isPopupActive = false;
 
-    flipset_init(ui->flipped);
-
     ui->winWidth = 800;
     ui->winHeight = 640;
     ui->title = TextFormat("BauriFontMaker");
@@ -73,7 +71,6 @@ Gui *NewGUI() {
 
 void FreeGui(Gui *ui) {
     FreeFontItemList(ui->items);
-    flipset_clear(ui->flipped);
     free(ui->conf);
     free(ui);
 }
@@ -199,7 +196,6 @@ void Layout(Gui *ui) {
             printf("Open File -> %s\n", ui->openFilename);
         }
     }
-
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {

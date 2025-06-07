@@ -1,7 +1,6 @@
 #ifndef _GUI_H_
 #define _GUI_H_
 
-#include "ext/mlib/m-dict.h"
 #include "ext/raylib.h"
 #include "fontitem.h"
 #include "fontitemlist.h"
@@ -12,8 +11,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
-DICT_SET_DEF(flipset, uint8_t)
 
 typedef struct {
     int gridBtnSize;
@@ -45,7 +42,6 @@ typedef struct Gui {
     char openFilename[512];
     char saveFilename[512];
 
-    flipset_t flipped;
     Vector2 itemListAnchor;
     FontItemList *items;
     FontItem *currentItem;

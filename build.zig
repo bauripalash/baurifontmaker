@@ -29,11 +29,24 @@ pub fn build(b: *std.Build) void {
     }
 
     exe.addIncludePath(b.path("src/include/"));
-    exe.addCSourceFiles(.{ .files = &.{
-        "src/gui.c",
-        "src/fontvalue.c",
-        "src/strlist.c",
-    } });
+
+    exe.addCSourceFiles(.{
+        .files = &.{
+            "src/filedialog.c",
+            "src/fontitem.c",
+            "src/fontitemlist.c",
+            "src/gui.c",
+            "src/itemselector.c",
+            "src/toolbar.c",
+
+            "src/windows/edititem.c",
+            "src/windows/newitem.c",
+
+            //external
+            "src/include/ext/tinyfiledialogs/tinyfiledialogs.c",
+        },
+    });
+
     exe_mod.linkLibrary(raylib_artifact);
     exe_mod.link_libc = true;
     exe.linkLibC();
