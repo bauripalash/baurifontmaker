@@ -6,10 +6,10 @@
 #include "include/fontitemlist.h"
 #include "include/itemselector.h"
 #include "include/toolbar.h"
+#include "include/uiopts.h"
 #include "include/utils.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
-#include <string.h>
 #define RAYGUI_IMPLEMENTATION
 #include "include/ext/raygui.h"
 
@@ -18,12 +18,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MARGIN              20 // Canvas Margin
 
 #define CANVAS_PANEL_MARGIN 10
-
-#define NEWWIN_BG           (Color){0, 0, 0, 200}
 
 void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
@@ -42,16 +41,7 @@ int canvasHeight = 0;
 
 Gui *NewGUI() {
     Gui *ui = (Gui *)malloc(sizeof(Gui));
-    ui->conf = (UiConfig *)malloc(sizeof(UiConfig));
-
-    ui->conf->gridBtnSize = 50;
-    ui->conf->enableGrid = true;
-    ui->conf->gridThickness = 2;
-    ui->conf->toolbarHeight = 50;
-    ui->conf->statusbarHeight = 30;
-    ui->conf->itemListWidth = 200;
-    ui->conf->gridSize = (Vector2){.x = 8, .y = 8};
-    ui->conf->isPopupActive = false;
+    ui->conf = NewUiConfig();
 
     ui->winWidth = 800;
     ui->winHeight = 640;
@@ -74,7 +64,7 @@ Gui *NewGUI() {
 
 void FreeGui(Gui *ui) {
     FreeFontItemList(ui->items);
-    free(ui->conf);
+    FreeUiConfig(ui->conf);
     free(ui);
 }
 
@@ -100,13 +90,7 @@ void GuiMain() {
 
     SetTargetFPS(60);
 
-    ui->conf->newItemWindowState = CreateNewItemWindow();
-    ui->conf->editItemWindowState = CreateEditItemWindow();
-    ui->conf->toolbarState = CreateToolbar(ui->conf->toolbarHeight);
-    ui->conf->itemSelectorState = CreateItemSelector(
-        ui->conf->itemListWidth, ui->conf->toolbarHeight,
-        ui->conf->statusbarHeight
-    );
+    ui->states = NewUiStates();
 
     TraceLog(
         LOG_WARNING, "OS CHECK -> WIN[%d] | LINUX[%d] | MAC[%d] | WEB[%d]",
@@ -135,35 +119,38 @@ void FillScrenForPopup(Gui *ui) {
             ui->winWidth,
             ui->winHeight,
         },
-        NEWWIN_BG
+        ColorTrBlack
     );
 }
 
 void handleNewItemWindow(Gui *ui) {
-    if (ui->conf->itemSelectorState.newBtnClicked) {
-        ui->conf->newItemWindowState.windowActive = true;
+    if (ui->states->itemSelector.newBtnClicked) {
+        ui->states->newItem.windowActive = true;
     }
-    if (NewItemWindow(&ui->conf->newItemWindowState)) {
+    if (NewItemWindow(&ui->states->newItem)) {
 
-        FontItem *tempItem = NewFontItem(ui->conf->newItemWindowState.nameStr);
-        SetNameValue(tempItem, ui->conf->newItemWindowState.hexValue);
+        FontItem *tempItem = NewFontItem(ui->states->newItem.nameStr);
+        SetNameValue(tempItem, ui->states->newItem.hexValue);
         AddToFontItemList(ui->items, tempItem);
     }
 }
 
 void handleEditItemWindow(Gui *ui) {
-    if (ui->conf->itemSelectorState.editBtnClicked) {
-        ui->conf->editItemWindowState.windowActive = true;
+    if (ui->states->itemSelector.editBtnClicked) {
+        ui->states->editItem.windowActive = true;
+        // SetStateEditItemWindow(ui., FontItem *target, int itemLen);
     }
 
-    if (EditItemWindow(&ui->conf->editItemWindowState, ui->currentItem)) {
-        printf("Shoud Create Edit Window\n");
+    if (EditItemWindow(
+            &ui->states->editItem, ui->currentItem, ui->items->len
+        )) {
+        printf("Shoud Create Edit Window [%zu]\n", ui->items->len);
     }
 }
 
 void handleItemSelector(Gui *ui) {
 
-    ui->currentItem = ui->items->items[ui->conf->itemSelectorState.active];
+    ui->currentItem = ui->items->items[ui->states->itemSelector.active];
 }
 
 void newFileDialog(Gui *ui) {}
@@ -172,8 +159,7 @@ void Layout(Gui *ui) {
     GuiEnableTooltip();
 
     ui->conf->isPopupActive =
-        (ui->conf->newItemWindowState.windowActive ||
-         ui->conf->editItemWindowState.windowActive);
+        (ui->states->newItem.windowActive || ui->states->editItem.windowActive);
 
     if (ui->conf->isPopupActive) {
 
@@ -183,11 +169,9 @@ void Layout(Gui *ui) {
     }
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
-    Toolbar(&ui->conf->toolbarState);
+    Toolbar(&ui->states->toolbar);
     canvasPanel(ui);
-    ItemSelector(
-        &ui->conf->itemSelectorState, ui->items->names, ui->items->len
-    );
+    ItemSelector(&ui->states->itemSelector, ui->items->names, ui->items->len);
     handleItemSelector(ui);
     StatusBarLayout(ui);
 
@@ -196,7 +180,7 @@ void Layout(Gui *ui) {
     handleNewItemWindow(ui);
     handleEditItemWindow(ui);
 
-    if (ui->conf->toolbarState.openBtnClicked) {
+    if (ui->states->toolbar.openBtnClicked) {
         bool ok = OpenFileDialog(
             "Open Font File", ui->openFilename, "*.bfont;*.baufnt;*.txt",
             "BauriFontMaker Font Files (*.bfont)"
@@ -258,10 +242,10 @@ void canvasLayout(Gui *ui, Rectangle panel) {
             };
 
             if (isCanvasBtnClicked(btnRect)) {
-                printf("[%d,%d]\n", col, row);
+                // printf("[%d,%d]\n", col, row);
                 FontItemFlipBit(ui->currentItem, col, row);
-                LogBinaryFontItem(ui->currentItem);
-                LogFontItem(ui->currentItem);
+                // LogBinaryFontItem(ui->currentItem);
+                // LogFontItem(ui->currentItem);
             }
 
             if (isHoverBtn(btnRect)) {
@@ -301,7 +285,7 @@ void canvasPanel(Gui *ui) {
 }
 
 void StatusBarLayout(Gui *ui) {
-    int hoverIndex = ui->conf->itemSelectorState.focus;
+    int hoverIndex = ui->states->itemSelector.focus;
     FontItem *hoveredFontItem = ui->items->items[hoverIndex];
     GuiStatusBar(
         (Rectangle){
@@ -311,7 +295,7 @@ void StatusBarLayout(Gui *ui) {
             ui->conf->statusbarHeight,
         },
         TextFormat(
-            "[%d, %d] | %s (%d)", gridPosX, gridPosY, hoveredFontItem->name,
+            "[%d, %d] | %s (0x%x)", gridPosX, gridPosY, hoveredFontItem->name,
             hoveredFontItem->nameValue
         )
     );

@@ -1,11 +1,12 @@
+#include "include/fontitem.h"
+#include "include/ext/raylib.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/ext/raylib.h"
-#include "include/fontitem.h"
 FontItem *NewFontItem(const char *name) {
     FontItem *fi = (FontItem *)calloc(1, sizeof(FontItem));
     fi->name = (char *)malloc((strlen(name) + 1) * sizeof(char));

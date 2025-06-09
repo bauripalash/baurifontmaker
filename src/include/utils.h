@@ -8,13 +8,12 @@
 #define OS_NAME_WEB   3
 
 bool IsValidHex(const char *str);
+
+// Os Check
+// Injected defination from cmake or zig build system
 bool IsLinux();
 bool IsWin();
 bool IsMac();
 bool IsWeb();
-
-// Os Check
-// Injected defination from cmake or zig build system
-//
 
 #endif

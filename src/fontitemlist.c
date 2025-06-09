@@ -37,6 +37,7 @@ void AddToFontItemList(FontItemList *fl, FontItem *item) {
 
     fl->items[fl->len] = item;
     fl->names[fl->len] = item->name;
+    item->listIndex = fl->len;
     fl->len++;
 }
 
@@ -74,6 +75,7 @@ void MoveFontItemList(FontItemList *fl, size_t from, size_t to) {
         );
     }
 
+    tempItem->listIndex = to;
     fl->items[to] = tempItem;
     fl->names[to] = tempName;
 }

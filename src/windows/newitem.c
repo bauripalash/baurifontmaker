@@ -1,12 +1,13 @@
+#include "../include/windows/newitem.h"
+#include "../include/ext/raygui.h"
+#include "../include/utils.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/utils.h"
-#include "../include/windows/newitem.h"
-
-NewItemWindowState CreateNewItemWindow() {
-    NewItemWindowState state = {};
+NewItemState CreateNewItemState() {
+    NewItemState state = {};
     state.windowActive = false;
     state.windowBounds = (Rectangle){
         0,
@@ -28,12 +29,12 @@ NewItemWindowState CreateNewItemWindow() {
     return state;
 }
 
-void CleanNewItemState(NewItemWindowState *state) {
+void CleanNewItemState(NewItemState *state) {
     strcpy(state->hexStr, "");
     strcpy(state->nameStr, "");
 }
 
-bool NewItemWindow(NewItemWindowState *state) {
+bool NewItemWindow(NewItemState *state) {
     state->windowBounds.x = (GetScreenWidth() - NW_WIDTH) * 0.5f;
     state->windowBounds.y = (GetScreenHeight() - NW_HEIGHT) * 0.5f;
     int errWinX = (GetScreenWidth() - NW_ERR_WIDTH) * 0.5f;

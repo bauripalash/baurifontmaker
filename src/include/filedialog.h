@@ -1,3 +1,6 @@
+#ifndef FILE_DIALOG_H
+#define FILE_DIALOG_H
+
 #include <stdbool.h>
 
 bool OpenFileDialog(
@@ -6,3 +9,5 @@ bool OpenFileDialog(
 bool SaveFileDialog(
     const char *title, char *filename, const char *filters, const char *msg
 );
+
+#endif

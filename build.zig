@@ -51,6 +51,7 @@ pub fn build(b: *std.Build) void {
             "src/itemselector.c",
             "src/toolbar.c",
             "src/utils.c",
+            "src/uiopts.c",
 
             "src/filedialog.c",
 

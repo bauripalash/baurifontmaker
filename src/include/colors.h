@@ -6,5 +6,6 @@
 Color ColorWhite = RAYWHITE;
 Color ColorBlack = BLACK;
 Color ColorRed = (Color){255, 0, 0, 255};
+Color ColorTrBlack = (Color){0, 0, 0, 200};
 
 #endif

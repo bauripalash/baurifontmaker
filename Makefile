@@ -2,6 +2,8 @@ BIN:=baurifontmaker
 CMAKE_OUTPUT:=build/$(BIN)/$(BIN)
 ZIG_OUTPUT:=zig-out/bin/$(BIN)
 
+all: crun
+
 .PHONY: zbuild
 zbuild:
 	zig build

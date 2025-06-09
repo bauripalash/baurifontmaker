@@ -1,7 +1,6 @@
 #ifndef WIN_NEWITEM_H
 #define WIN_NEWITEM_H
 
-#include "../ext/raygui.h"
 #include "../ext/raylib.h"
 
 #include <stdbool.h>
@@ -29,9 +28,9 @@ typedef struct {
 
     bool invalidHexError;
 
-} NewItemWindowState;
+} NewItemState;
 
-NewItemWindowState CreateNewItemWindow(void);
-void CleanNewItemState(NewItemWindowState *state);
-bool NewItemWindow(NewItemWindowState *state);
+NewItemState CreateNewItemState(void);
+void CleanNewItemState(NewItemState *state);
+bool NewItemWindow(NewItemState *state);
 #endif

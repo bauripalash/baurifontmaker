@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// tinyfiledialogs need to below these system headers
+// to get wchar_t definition on windows
+
 #include "include/ext/raylib.h"
 #include "include/ext/tinyfiledialogs/tinyfiledialogs.h"
 #include "include/filedialog.h"
