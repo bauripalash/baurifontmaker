@@ -1,0 +1,6 @@
+{
+    "skip-analysis-in-path": [
+        "src/include/ext",
+		"build/_deps/"
+    ]
+}

@@ -1,4 +1,5 @@
 #include "include/fontitemlist.h"
+#include "include/ext/raylib.h"
 #include "include/fontitem.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +9,10 @@
 
 FontItemList *NewFontItemList() {
     FontItemList *fl = (FontItemList *)malloc(sizeof(FontItemList));
+    if (fl != NULL) {
+        printf("Font Item List Allocation Error\n");
+        return NULL;
+    }
     // TODO: Error check
     fl->len = 0;
     fl->cap = 10;

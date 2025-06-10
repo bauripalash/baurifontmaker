@@ -1,4 +1,5 @@
 #include "include/utils.h"
+#include "include/ext/raylib.h"
 #include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -25,6 +26,13 @@ bool IsValidHex(const char *str) {
     }
 
     return true;
+}
+
+Rectangle GetCenteredRect(int width, int height) {
+    return (Rectangle){.x = (GetScreenWidth() - width) * 0.5f,
+                       .y = (GetScreenHeight() - height) * 0.5f,
+                       .width = width,
+                       .height = height};
 }
 
 bool IsLinux() {

@@ -1,5 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
+#include "ext/raylib.h"
 #include <stdbool.h>
 
 #define OS_NAME_LINUX 0
@@ -15,5 +16,7 @@ bool IsLinux();
 bool IsWin();
 bool IsMac();
 bool IsWeb();
+
+Rectangle GetCenteredRect(int width, int height);
 
 #endif

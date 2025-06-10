@@ -36,3 +36,25 @@ valgrind: cbuild
 .PHONY:valgrind_z
 valgrind_z: zbuild
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(ZIG_OUTPUT) > valgrind.log 2>&1
+
+.PHONY: infer
+infer: clean
+	infer run --compilation-database build/compile_commands.json
+
+.PHONY: cppcheck
+cppcheck:
+	cppcheck \
+		--project=build/compile_commands.json \
+		--template=gcc\
+		--enable=all --force --inline-suppr \
+		-Dfalse=0 \
+		--suppressions-list=cppcheck-suppress.txt \
+		-ibuild/_deps -isrc/include/ext 2>cppcheck-result.txt
+
+
+.PHONY: cmake_clean
+cmake_clean:
+	make clean -C build
+
+.PHONY: clean
+clean: cmake_clean

@@ -1,5 +1,6 @@
 #include "include/gui.h"
 #include "include/colors.h"
+#include "include/defaults.h"
 #include "include/ext/raylib.h"
 #include "include/filedialog.h"
 #include "include/fontitem.h"
@@ -39,6 +40,8 @@ int gridPosY = 0;
 int canvasWidth = 0;
 int canvasHeight = 0;
 
+bool hasError = false;
+
 Gui *NewGUI() {
     Gui *ui = (Gui *)malloc(sizeof(Gui));
     ui->conf = NewUiConfig();
@@ -47,23 +50,32 @@ Gui *NewGUI() {
     ui->winHeight = 640;
     ui->title = TextFormat("BauriFontMaker");
     ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
-    ui->items = NewFontItemList();
     ui->currentItem = NULL;
 
     strcpy(ui->openFilename, "");
     strcpy(ui->saveFilename, "");
 
-    ui->items = NewFontItemList();
-    FontItem *tempItem = NewFontItem("0x00000");
-    SetNameValue(tempItem, 0);
-    AddToFontItemList(ui->items, tempItem);
-    ui->currentItem = ui->items->items[0];
+    FontItemList *flist = NewFontItemList();
+
+    if (flist == NULL) {
+        hasError = true;
+        ui->items = NULL;
+    } else {
+        ui->items = flist;
+    }
+
+    // FontItem *tempItem = NewFontItem("0x00000");
+    // SetNameValue(tempItem, 0);
+    // AddToFontItemList(ui->items, tempItem);
+    // ui->currentItem = ui->items->items[0];
 
     return ui;
 }
 
 void FreeGui(Gui *ui) {
-    FreeFontItemList(ui->items);
+    if (ui->items != NULL) {
+        FreeFontItemList(ui->items);
+    }
     FreeUiConfig(ui->conf);
     free(ui);
 }
@@ -80,13 +92,13 @@ void FreeStyles() {
 
 void GuiMain() {
 
-    Gui *ui = NewGUI();
     SetTraceLogLevel(LOG_WARNING);
-
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(ui->winWidth, ui->winHeight, ui->title);
-    SetWindowMinSize(ui->winWidth, ui->winHeight);
+    InitWindow(DEF_WIN_WIDTH, DEF_WIN_HEIGHT, DEF_WIN_TITLE);
+    SetWindowMinSize(DEF_WIN_WIDTH, DEF_WIN_HEIGHT);
     GuiLoadStyleLightBFM();
+
+    Gui *ui = NewGUI();
 
     SetTargetFPS(60);
 
@@ -99,8 +111,22 @@ void GuiMain() {
     while (!WindowShouldClose()) {
         BeginDrawing();
         {
-            UpdateData(ui);
             ClearBackground(RAYWHITE);
+            if (hasError) {
+                bool clicked =
+                    GuiMessageBox(
+                        GetCenteredRect(DEF_ERR_WIN_WIDTH, DEF_ERR_WIN_HEIGHT),
+                        "Fatal Memory Error",
+                        "Failed to allocate memory for font item list!", "Close"
+                    ) != -1;
+
+                EndDrawing();
+                if (clicked) {
+                    break;
+                }
+                continue;
+            }
+            UpdateData(ui);
             Layout(ui);
         }
         EndDrawing();

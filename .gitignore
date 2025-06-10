@@ -2,7 +2,8 @@
 build/
 .cache/
 valgrind.log
-
+infer-out/
+cppcheck-result.txt
 ##### C.gitignore #####
 # Prerequisites
 *.d

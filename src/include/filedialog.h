@@ -10,4 +10,6 @@ bool SaveFileDialog(
     const char *title, char *filename, const char *filters, const char *msg
 );
 
+void MessageDialog(const char *title, const char *msg);
+
 #endif
