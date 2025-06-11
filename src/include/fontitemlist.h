@@ -16,6 +16,7 @@ void FreeFontItemList(FontItemList *fl);
 void AddToFontItemList(FontItemList *fl, FontItem *item);
 void IndexFontItemList(FontItemList *fl, const char *name);
 void IndexFromCodeFontItemList(FontItemList *fl, int code);
+void RemoveFromFontItem(FontItemList *fl, FontItem *item);
 void MoveFontItemList(FontItemList *fl, size_t from, size_t to);
 
 #endif

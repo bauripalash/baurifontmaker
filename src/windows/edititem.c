@@ -1,5 +1,6 @@
 #include "../include/windows/edititem.h"
 #include "../include/ext/raygui.h"
+#include "../include/utils.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -31,9 +32,7 @@ EditItemState CreateEditItemState() {
     return state;
 }
 
-void SetStateEditItemWindow(
-    EditItemState *state, FontItem *target, int itemLen
-) {
+void SetStateEditItem(EditItemState *state, FontItem *target, int itemLen) {
     strcpy(state->hexStr, TextFormat("0x%x", target->nameValue));
     strcpy(state->nameStr, target->name);
     state->indexValue = target->listIndex;
@@ -137,10 +136,16 @@ int EditItemWindow(EditItemState *state, FontItem *target, int itemLen) {
         }
 
         if (saveClicked) {
+            if (!IsValidHex(state->hexStr)) {
+                state->invalidHexError = true;
+            } else {
+                state->windowActive = false;
+            }
             return EDIT_SAVE_CLICK;
         }
 
         if (removeClicked) {
+            state->windowActive = false;
             return EDIT_REMOVE_CLICK;
         }
 

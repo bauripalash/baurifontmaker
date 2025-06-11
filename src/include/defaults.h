@@ -5,8 +5,8 @@
 #define DEF_WIN_WIDTH        800
 #define DEF_WIN_TITLE        "BauriFontMaker"
 
-#define DEF_ERR_WIN_WIDTH    400
-#define DEF_ERR_WIN_HEIGHT   100
+#define DEF_ERR_WIN_WIDTH    500
+#define DEF_ERR_WIN_HEIGHT   200
 
 #define DEF_TOOLBAR_HEIGHT   50
 #define DEF_STATUSBAR_HEIGHT 30

@@ -37,8 +37,6 @@ void CleanNewItemState(NewItemState *state) {
 bool NewItemWindow(NewItemState *state) {
     state->windowBounds.x = (GetScreenWidth() - NW_WIDTH) * 0.5f;
     state->windowBounds.y = (GetScreenHeight() - NW_HEIGHT) * 0.5f;
-    int errWinX = (GetScreenWidth() - NW_ERR_WIDTH) * 0.5f;
-    int errWinY = (GetScreenHeight() - NW_ERR_HEIGHT) * 0.5f;
     int winPosX = state->windowBounds.x;
     int winPosY = state->windowBounds.y;
     if (state->windowActive) {
@@ -92,7 +90,7 @@ bool NewItemWindow(NewItemState *state) {
             if (!IsValidHex(state->hexStr)) {
                 state->invalidHexError = true;
             } else {
-                if (TextLength(state->nameStr) <= 0) {
+                if (TextLength(state->nameStr) == 0) {
                     TextCopy(state->nameStr, state->hexStr);
                 }
                 int hexBase = 16;

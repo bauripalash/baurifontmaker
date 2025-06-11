@@ -9,18 +9,38 @@
 
 FontItemList *NewFontItemList() {
     FontItemList *fl = (FontItemList *)malloc(sizeof(FontItemList));
-    if (fl != NULL) {
-        printf("Font Item List Allocation Error\n");
+    if (fl == NULL) {
+        TraceLog(
+            LOG_ERROR, "Font Item List allocation failed while creating struct"
+        );
         return NULL;
     }
-    // TODO: Error check
     fl->len = 0;
     fl->cap = 10;
 
     fl->items = malloc(fl->cap * sizeof(FontItem *));
+
+    if (fl->items == NULL) {
+        TraceLog(
+            LOG_ERROR,
+            "Font item List allocation failed while creating item list"
+        );
+
+        free(fl);
+        return NULL;
+    }
+
     fl->names = malloc(fl->cap * sizeof(const char **));
 
-    // TODO: Memory allocation error check
+    if (fl->names == NULL) {
+        TraceLog(
+            LOG_ERROR,
+            "Font Item List allocation failed while creating names list"
+        );
+        free(fl->items);
+        free(fl);
+        return NULL;
+    }
 
     return fl;
 }
@@ -45,6 +65,12 @@ void AddToFontItemList(FontItemList *fl, FontItem *item) {
     item->listIndex = fl->len;
     fl->len++;
 }
+
+void IndexFontItemList(FontItemList *fl, const char *name); // TODO:
+
+void IndexFromCodeFontItemList(FontItemList *fl, int code); // TODO:
+
+void RemoveFromFontItem(FontItemList *fl, FontItem *item); // TODO:
 
 void MoveFontItemList(FontItemList *fl, size_t from, size_t to) {
     if (from >= fl->len || to >= fl->len) {
@@ -86,7 +112,9 @@ void MoveFontItemList(FontItemList *fl, size_t from, size_t to) {
 }
 
 void FreeFontItemList(FontItemList *fl) {
-    // TODO: check if fl is valid
+    if (fl == NULL) {
+        return;
+    }
     for (size_t i = 0; i < fl->len; i++) {
         FreeFontItem(fl->items[i]);
     }

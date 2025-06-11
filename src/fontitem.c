@@ -9,7 +9,18 @@
 
 FontItem *NewFontItem(const char *name) {
     FontItem *fi = (FontItem *)calloc(1, sizeof(FontItem));
+    if (fi == NULL) {
+        TraceLog(LOG_ERROR, "Failed to allocate memory for new Font Item");
+        return NULL;
+    }
     fi->name = (char *)malloc((strlen(name) + 1) * sizeof(char));
+
+    if (fi->name == NULL) {
+        TraceLog(LOG_ERROR, "Failed to allocate memory for font item's name");
+        free(fi);
+        return NULL;
+    }
+
     TextCopy(fi->name, name);
     fi->nameValue = 0x0;
     fi->listIndex = 0;
@@ -17,7 +28,12 @@ FontItem *NewFontItem(const char *name) {
     return fi;
 }
 void FreeFontItem(FontItem *fi) {
-    free(fi->name);
+    if (fi == NULL) {
+        return;
+    }
+    if (fi->name != NULL) {
+        free(fi->name);
+    }
     free(fi);
 }
 void SetNameValue(FontItem *fi, int value) { fi->nameValue = value; }
@@ -28,14 +44,14 @@ uint8_t FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row) {
 
     return val;
 }
-bool FontItemGetFlip(FontItem *fi, uint8_t col, uint8_t row) {
+bool FontItemGetFlip(const FontItem *fi, uint8_t col, uint8_t row) {
     uint8_t bts = fi->bits[row];
     uint8_t val = (bts >> (7 - col)) & 1;
 
     return val == 1;
 }
 
-uint8_t *GetFlippedIndexes(FontItem *fi, int *length) {
+uint8_t *GetFlippedIndexes(const FontItem *fi, int *length) {
     uint8_t *result = (uint8_t *)calloc(64, sizeof(uint8_t));
 
     *length = 0;
@@ -57,7 +73,7 @@ uint8_t *GetFlippedIndexes(FontItem *fi, int *length) {
     return result;
 }
 
-void LogFontItem(FontItem *fi) {
+void LogFontItem(const FontItem *fi) {
     printf("[ ");
     for (int i = 0; i < 8; i++) {
         printf("0x%X, ", fi->bits[i]);
@@ -65,7 +81,7 @@ void LogFontItem(FontItem *fi) {
     printf(" ]\n");
 }
 
-void LogBinaryFontItem(FontItem *fi) {
+void LogBinaryFontItem(const FontItem *fi) {
     printf("[\n");
     for (int i = 0; i < 8; i++) {
 

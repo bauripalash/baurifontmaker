@@ -10,8 +10,8 @@
 #define EDIT_W_WIDTH      500
 #define EDIT_W_HEIGHT     300
 
-#define EDIT_SAVE_CLICK   0
-#define EDIT_CANCEL_CLICK 1
+#define EDIT_CANCEL_CLICK 0
+#define EDIT_SAVE_CLICK   1
 #define EDIT_REMOVE_CLICK 2
 
 #define EDIT_ERR_WIDTH    400

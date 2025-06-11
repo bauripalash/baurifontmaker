@@ -11,6 +11,7 @@
 #include "include/utils.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
+
 #define RAYGUI_IMPLEMENTATION
 #include "include/ext/raygui.h"
 
@@ -22,9 +23,9 @@
 #include <string.h>
 
 #define MARGIN              20 // Canvas Margin
-
 #define CANVAS_PANEL_MARGIN 10
 
+bool ShowPrelimErrorMsg(GuiPrelimError err);
 void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
 void ToolBarLayout(Gui *ui);
@@ -42,9 +43,21 @@ int canvasHeight = 0;
 
 bool hasError = false;
 
-Gui *NewGUI() {
+Gui *NewGUI(GuiPrelimError *err) {
     Gui *ui = (Gui *)malloc(sizeof(Gui));
+    if (ui == NULL) {
+        *err = PRELIM_GUI_ALLOC_FAILED;
+        return NULL;
+    }
+    ui->states = NULL;
+    ui->items = NULL;
     ui->conf = NewUiConfig();
+
+    if (ui->conf == NULL) {
+        FreeGui(ui);
+        *err = PRELIM_CONFIG_ALLOC_FAILED;
+        return NULL;
+    }
 
     ui->winWidth = 800;
     ui->winHeight = 640;
@@ -55,28 +68,44 @@ Gui *NewGUI() {
     strcpy(ui->openFilename, "");
     strcpy(ui->saveFilename, "");
 
-    FontItemList *flist = NewFontItemList();
-
-    if (flist == NULL) {
-        hasError = true;
-        ui->items = NULL;
-    } else {
-        ui->items = flist;
+    ui->items = NewFontItemList();
+    if (ui->items == NULL) {
+        FreeGui(ui);
+        *err = PRELIM_FONTLIST_ALLOC_FAILED;
+        return NULL;
     }
 
-    // FontItem *tempItem = NewFontItem("0x00000");
-    // SetNameValue(tempItem, 0);
-    // AddToFontItemList(ui->items, tempItem);
-    // ui->currentItem = ui->items->items[0];
+    FontItem *tempItem = NewFontItem("0x00000");
+
+    if (tempItem == NULL) {
+        FreeGui(ui);
+        *err = PRELIM_FONTITEM_ALLOC_FAILED;
+        return NULL;
+    }
+
+    SetNameValue(tempItem, 0);
+    AddToFontItemList(ui->items, tempItem);
+    ui->currentItem = ui->items->items[0];
+
+    *err = PRELIM_OK;
 
     return ui;
 }
 
 void FreeGui(Gui *ui) {
+    if (ui == NULL) {
+        return;
+    }
     if (ui->items != NULL) {
         FreeFontItemList(ui->items);
     }
-    FreeUiConfig(ui->conf);
+    if (ui->conf != NULL) {
+        FreeUiConfig(ui->conf);
+    }
+
+    if (ui->states != NULL) {
+        FreeUiStates(ui->states);
+    }
     free(ui);
 }
 
@@ -90,6 +119,47 @@ void FreeStyles() {
     UnloadFont(f);
 }
 
+bool ShowPrelimErrorMsg(GuiPrelimError err) {
+    char errMSg[255];
+
+    switch (err) {
+    case PRELIM_OK:
+        break;
+    case PRELIM_GUI_ALLOC_FAILED: {
+        strcpy(errMSg, "GUI Structure");
+        break;
+    }
+
+    case PRELIM_CONFIG_ALLOC_FAILED: {
+        strcpy(errMSg, "Application Configuration");
+        break;
+    }
+
+    case PRELIM_FONTLIST_ALLOC_FAILED: {
+        strcpy(errMSg, "Font Item List");
+        break;
+    }
+
+    case PRELIM_FONTITEM_ALLOC_FAILED: {
+        strcpy(errMSg, "Default Font Item");
+        break;
+    }
+
+    case PRELIM_STATES_ALLOC_FAILED: {
+        strcpy(errMSg, "GUI Application States");
+        break;
+    }
+    }
+
+    bool clicked =
+        GuiMessageBox(
+            GetCenteredRect(DEF_ERR_WIN_WIDTH, DEF_ERR_WIN_HEIGHT),
+            GuiIconText(ICON_WARNING, "Fatal Memory Error"),
+            TextFormat("Failed to allocate memory for %s", errMSg), "Close"
+        ) != -1;
+    return clicked;
+}
+
 void GuiMain() {
 
     SetTraceLogLevel(LOG_WARNING);
@@ -98,28 +168,27 @@ void GuiMain() {
     SetWindowMinSize(DEF_WIN_WIDTH, DEF_WIN_HEIGHT);
     GuiLoadStyleLightBFM();
 
-    Gui *ui = NewGUI();
+    GuiPrelimError err;
+
+    Gui *ui = NewGUI(&err);
 
     SetTargetFPS(60);
 
-    ui->states = NewUiStates();
+    if (ui != NULL) {
+        ui->states = NewUiStates();
+        if (ui->states == NULL) {
+            if (err == PRELIM_OK) {
+                err = PRELIM_STATES_ALLOC_FAILED;
+            }
+        }
+    }
 
-    TraceLog(
-        LOG_WARNING, "OS CHECK -> WIN[%d] | LINUX[%d] | MAC[%d] | WEB[%d]",
-        IsWin(), IsLinux(), IsMac(), IsWeb()
-    );
     while (!WindowShouldClose()) {
         BeginDrawing();
         {
-            ClearBackground(RAYWHITE);
-            if (hasError) {
-                bool clicked =
-                    GuiMessageBox(
-                        GetCenteredRect(DEF_ERR_WIN_WIDTH, DEF_ERR_WIN_HEIGHT),
-                        "Fatal Memory Error",
-                        "Failed to allocate memory for font item list!", "Close"
-                    ) != -1;
-
+            ClearBackground(ColorBg);
+            if (err != PRELIM_OK) {
+                bool clicked = ShowPrelimErrorMsg(err);
                 EndDrawing();
                 if (clicked) {
                     break;
@@ -137,7 +206,7 @@ void GuiMain() {
     CloseWindow();
 }
 
-void FillScrenForPopup(Gui *ui) {
+void FillScrenForPopup(const Gui *ui) {
     DrawRectangleRec(
         (Rectangle){
             0,
@@ -152,6 +221,7 @@ void FillScrenForPopup(Gui *ui) {
 void handleNewItemWindow(Gui *ui) {
     if (ui->states->itemSelector.newBtnClicked) {
         ui->states->newItem.windowActive = true;
+        CleanNewItemState(&ui->states->newItem);
     }
     if (NewItemWindow(&ui->states->newItem)) {
 
@@ -164,13 +234,21 @@ void handleNewItemWindow(Gui *ui) {
 void handleEditItemWindow(Gui *ui) {
     if (ui->states->itemSelector.editBtnClicked) {
         ui->states->editItem.windowActive = true;
-        // SetStateEditItemWindow(ui., FontItem *target, int itemLen);
+        SetStateEditItem(
+            &ui->states->editItem, ui->currentItem, ui->items->len
+        );
     }
 
-    if (EditItemWindow(
-            &ui->states->editItem, ui->currentItem, ui->items->len
-        )) {
-        printf("Shoud Create Edit Window [%zu]\n", ui->items->len);
+    int result =
+        EditItemWindow(&ui->states->editItem, ui->currentItem, ui->items->len);
+
+    if (result == EDIT_SAVE_CLICK) {
+        TraceLog(ICON_WARNING, "Clicked Save");
+    } else if (result == EDIT_REMOVE_CLICK) {
+
+        TraceLog(ICON_WARNING, "Clicked Remove");
+    } else {
+        return;
     }
 }
 
@@ -191,7 +269,6 @@ void Layout(Gui *ui) {
 
         GuiLock();
         FillScrenForPopup(ui);
-        // TODO: Do something about ignoring inputs
     }
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
@@ -268,10 +345,7 @@ void canvasLayout(Gui *ui, Rectangle panel) {
             };
 
             if (isCanvasBtnClicked(btnRect)) {
-                // printf("[%d,%d]\n", col, row);
                 FontItemFlipBit(ui->currentItem, col, row);
-                // LogBinaryFontItem(ui->currentItem);
-                // LogFontItem(ui->currentItem);
             }
 
             if (isHoverBtn(btnRect)) {

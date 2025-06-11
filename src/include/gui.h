@@ -9,6 +9,15 @@
 #include "fontitemlist.h"
 #include "uiopts.h"
 
+typedef enum {
+    PRELIM_OK = 0,
+    PRELIM_GUI_ALLOC_FAILED,
+    PRELIM_CONFIG_ALLOC_FAILED,
+    PRELIM_FONTLIST_ALLOC_FAILED,
+    PRELIM_FONTITEM_ALLOC_FAILED,
+    PRELIM_STATES_ALLOC_FAILED,
+} GuiPrelimError;
+
 typedef struct Gui {
     int winWidth;
     int winHeight;
@@ -25,7 +34,7 @@ typedef struct Gui {
 
 } Gui;
 
-Gui *NewGUI();
+Gui *NewGUI(GuiPrelimError *err);
 void FreeGui(Gui *ui);
 void GuiMain();
 

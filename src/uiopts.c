@@ -10,7 +10,10 @@
 
 UiConfig *NewUiConfig() {
     UiConfig *uc = (UiConfig *)calloc(1, sizeof(UiConfig));
-    // TODO: Check Memory errors
+    if (uc == NULL) {
+        TraceLog(LOG_ERROR, "Failed to allocate memory for new Ui Config");
+        return NULL;
+    }
     uc->enableGrid = true;
     uc->gridBtnSize = DEF_GRID_BTN_SIZE;
     uc->gridThickness = DEF_GRID_THICKNESS;
@@ -22,11 +25,18 @@ UiConfig *NewUiConfig() {
 
     return uc;
 }
-void FreeUiConfig(UiConfig *conf) { free(conf); }
+void FreeUiConfig(UiConfig *conf) {
+    if (conf != NULL) {
+        free(conf);
+    }
+}
 
 UiStates *NewUiStates() {
     UiStates *states = (UiStates *)calloc(1, sizeof(UiStates));
-    // TODO: Check memory Errors
+    if (states == NULL) {
+        TraceLog(LOG_ERROR, "Failed to allocate for new UI states");
+        return NULL;
+    }
     states->newItem = CreateNewItemState();
     states->editItem = CreateEditItemState();
     states->toolbar = CreateToolbar(DEF_TOOLBAR_HEIGHT);
@@ -36,4 +46,8 @@ UiStates *NewUiStates() {
 
     return states;
 }
-void FreeUiStates(UiStates *states) { free(states); }
+void FreeUiStates(UiStates *states) {
+    if (states != NULL) {
+        free(states);
+    }
+}
