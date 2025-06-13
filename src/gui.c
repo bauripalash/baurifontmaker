@@ -35,6 +35,9 @@ void ItemSelectorLayout(Gui *ui);
 void canvasPanel(Gui *ui);
 void canvasLayout(Gui *ui, Rectangle panel);
 
+
+bool handleAppError(const Gui * ui);
+
 int gridPosX = 0;
 int gridPosY = 0;
 
@@ -86,6 +89,8 @@ Gui *NewGUI(GuiPrelimError *err) {
     SetNameValue(tempItem, 0);
     AddToFontItemList(ui->items, tempItem);
     ui->currentItem = ui->items->items[0];
+
+	ui->apperr = APPERR_OK;
 
     *err = PRELIM_OK;
 
@@ -160,6 +165,14 @@ bool ShowPrelimErrorMsg(GuiPrelimError err) {
     return clicked;
 }
 
+void ClearAppError(Gui * ui){
+	ui->apperr = APPERR_OK;
+}
+
+bool HasAppError(Gui * ui){
+	return ui->apperr != APPERR_OK;
+}
+
 void GuiMain() {
 
     SetTraceLogLevel(LOG_WARNING);
@@ -225,10 +238,12 @@ void handleNewItemWindow(Gui *ui) {
     }
     if (NewItemWindow(&ui->states->newItem)) {
 
+		ui->apperr = APPERR_NEWITEM_ALLOC;
         FontItem *tempItem = NewFontItem(ui->states->newItem.nameStr);
         SetNameValue(tempItem, ui->states->newItem.hexValue);
         AddToFontItemList(ui->items, tempItem);
     }
+
 }
 
 void handleEditItemWindow(Gui *ui) {
@@ -265,11 +280,12 @@ void Layout(Gui *ui) {
     ui->conf->isPopupActive =
         (ui->states->newItem.windowActive || ui->states->editItem.windowActive);
 
-    if (ui->conf->isPopupActive) {
+    if (ui->conf->isPopupActive || HasAppError(ui)) {
 
         GuiLock();
         FillScrenForPopup(ui);
     }
+
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
@@ -293,6 +309,34 @@ void Layout(Gui *ui) {
             printf("Open File -> %s\n", ui->openFilename);
         }
     }
+
+	if (HasAppError(ui)) {
+		if (handleAppError(ui)){
+			ClearAppError(ui);
+		}
+	}
+}
+
+bool handleAppError(const Gui * ui){
+	//TD: make it modular
+	
+	char errorMsg[128];
+
+	switch (ui->apperr) {
+		case APPERR_NEWITEM_ALLOC:{
+			strcpy(errorMsg, "Failed to Create New Font Item");
+		}
+		default:break;
+	}
+	
+	bool result = GuiMessageBox(
+		GetCenteredRect(DEF_ERR_WIN_WIDTH, DEF_ERR_WIN_HEIGHT), 
+		GuiIconText(ICON_WARNING, "Fatal Error Occured"), 
+		errorMsg, 
+		"Close"
+	) != -1;
+
+	return result;
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {
