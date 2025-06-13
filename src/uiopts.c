@@ -1,4 +1,5 @@
 #include "include/uiopts.h"
+#include "include/balloc.h"
 #include "include/defaults.h"
 #include "include/ext/raylib.h"
 #include "include/itemselector.h"
@@ -6,10 +7,9 @@
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
 #include <stdbool.h>
-#include <stdlib.h>
 
 UiConfig *NewUiConfig() {
-    UiConfig *uc = (UiConfig *)calloc(1, sizeof(UiConfig));
+    UiConfig *uc = (UiConfig *)bcalloc(1, sizeof(UiConfig));
     if (uc == NULL) {
         TraceLog(LOG_ERROR, "Failed to allocate memory for new Ui Config");
         return NULL;
@@ -27,12 +27,12 @@ UiConfig *NewUiConfig() {
 }
 void FreeUiConfig(UiConfig *conf) {
     if (conf != NULL) {
-        free(conf);
+        bfree(conf);
     }
 }
 
 UiStates *NewUiStates() {
-    UiStates *states = (UiStates *)calloc(1, sizeof(UiStates));
+    UiStates *states = (UiStates *)bcalloc(1, sizeof(UiStates));
     if (states == NULL) {
         TraceLog(LOG_ERROR, "Failed to allocate for new UI states");
         return NULL;
@@ -48,6 +48,6 @@ UiStates *NewUiStates() {
 }
 void FreeUiStates(UiStates *states) {
     if (states != NULL) {
-        free(states);
+        bfree(states);
     }
 }

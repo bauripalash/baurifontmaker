@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
 
 // tinyfiledialogs need to below these system headers

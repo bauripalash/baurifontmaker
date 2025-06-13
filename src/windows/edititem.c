@@ -33,7 +33,7 @@ EditItemState CreateEditItemState() {
 }
 
 void SetStateEditItem(EditItemState *state, FontItem *target, int itemLen) {
-    strcpy(state->hexStr, TextFormat("0x%x", target->nameValue));
+    strcpy(state->hexStr, TextFormat("0x%x", target->value));
     strcpy(state->nameStr, target->name);
     state->indexValue = target->listIndex;
 }

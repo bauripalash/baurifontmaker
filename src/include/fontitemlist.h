@@ -2,6 +2,7 @@
 #define FONTITEM_LIST_H
 
 #include "fontitem.h"
+#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct {
@@ -13,7 +14,7 @@ typedef struct {
 
 FontItemList *NewFontItemList();
 void FreeFontItemList(FontItemList *fl);
-void AddToFontItemList(FontItemList *fl, FontItem *item);
+bool AddToFontItemList(FontItemList *fl, FontItem *item);
 void IndexFontItemList(FontItemList *fl, const char *name);
 void IndexFromCodeFontItemList(FontItemList *fl, int code);
 void RemoveFromFontItem(FontItemList *fl, FontItem *item);

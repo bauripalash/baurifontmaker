@@ -33,6 +33,15 @@ fmt:
 valgrind: cbuild
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(CMAKE_OUTPUT) > valgrind.log 2>&1
 
+.PHONY: massif
+massif: cbuild
+	valgrind --tool=massif $(CMAKE_OUTPUT)
+
+.PHONY: perf
+perf:
+	perf record -g -F 999 ./$(CMAKE_OUTPUT)
+	perf script -F +pid > baurifontmaker.perf
+
 .PHONY:valgrind_z
 valgrind_z: zbuild
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(ZIG_OUTPUT) > valgrind.log 2>&1

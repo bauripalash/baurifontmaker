@@ -12,6 +12,9 @@
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
 
+#define BALLOC_IMPL
+#include "include/balloc.h"
+
 #define RAYGUI_IMPLEMENTATION
 #include "include/ext/raygui.h"
 
@@ -19,7 +22,6 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define MARGIN              20 // Canvas Margin
@@ -35,8 +37,7 @@ void ItemSelectorLayout(Gui *ui);
 void canvasPanel(Gui *ui);
 void canvasLayout(Gui *ui, Rectangle panel);
 
-
-bool handleAppError(const Gui * ui);
+bool handleAppError(const Gui *ui);
 
 int gridPosX = 0;
 int gridPosY = 0;
@@ -47,7 +48,7 @@ int canvasHeight = 0;
 bool hasError = false;
 
 Gui *NewGUI(GuiPrelimError *err) {
-    Gui *ui = (Gui *)malloc(sizeof(Gui));
+    Gui *ui = (Gui *)balloc(sizeof(Gui));
     if (ui == NULL) {
         *err = PRELIM_GUI_ALLOC_FAILED;
         return NULL;
@@ -86,11 +87,11 @@ Gui *NewGUI(GuiPrelimError *err) {
         return NULL;
     }
 
-    SetNameValue(tempItem, 0);
+    SetFontValue(tempItem, 0);
     AddToFontItemList(ui->items, tempItem);
     ui->currentItem = ui->items->items[0];
 
-	ui->apperr = APPERR_OK;
+    ui->apperr = APPERR_OK;
 
     *err = PRELIM_OK;
 
@@ -111,7 +112,7 @@ void FreeGui(Gui *ui) {
     if (ui->states != NULL) {
         FreeUiStates(ui->states);
     }
-    free(ui);
+    bfree(ui);
 }
 
 void UpdateData(Gui *ui) {
@@ -165,15 +166,12 @@ bool ShowPrelimErrorMsg(GuiPrelimError err) {
     return clicked;
 }
 
-void ClearAppError(Gui * ui){
-	ui->apperr = APPERR_OK;
-}
+void ClearAppError(Gui *ui) { ui->apperr = APPERR_OK; }
 
-bool HasAppError(Gui * ui){
-	return ui->apperr != APPERR_OK;
-}
+bool HasAppError(Gui *ui) { return ui->apperr != APPERR_OK; }
 
 void GuiMain() {
+    SeedRandom();
 
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -214,6 +212,7 @@ void GuiMain() {
         EndDrawing();
     }
 
+    MemStats();
     FreeGui(ui);
     FreeStyles();
     CloseWindow();
@@ -238,12 +237,19 @@ void handleNewItemWindow(Gui *ui) {
     }
     if (NewItemWindow(&ui->states->newItem)) {
 
-		ui->apperr = APPERR_NEWITEM_ALLOC;
         FontItem *tempItem = NewFontItem(ui->states->newItem.nameStr);
-        SetNameValue(tempItem, ui->states->newItem.hexValue);
-        AddToFontItemList(ui->items, tempItem);
-    }
+        if (!tempItem) {
+            ui->apperr = APPERR_NEWITEM_ALLOC;
+            return;
+        }
+        SetFontValue(tempItem, ui->states->newItem.hexValue);
+        bool addOk = AddToFontItemList(ui->items, tempItem);
 
+        if (!addOk) {
+            ui->apperr = APPERR_FONTLIST_ADD;
+            return;
+        }
+    }
 }
 
 void handleEditItemWindow(Gui *ui) {
@@ -286,7 +292,6 @@ void Layout(Gui *ui) {
         FillScrenForPopup(ui);
     }
 
-
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
     canvasPanel(ui);
@@ -310,33 +315,47 @@ void Layout(Gui *ui) {
         }
     }
 
-	if (HasAppError(ui)) {
-		if (handleAppError(ui)){
-			ClearAppError(ui);
-		}
-	}
+    if (HasAppError(ui)) {
+        if (handleAppError(ui)) {
+            ClearAppError(ui);
+        }
+    }
 }
 
-bool handleAppError(const Gui * ui){
-	//TD: make it modular
-	
-	char errorMsg[128];
+bool handleAppError(const Gui *ui) {
+    // TD: make it modular
 
-	switch (ui->apperr) {
-		case APPERR_NEWITEM_ALLOC:{
-			strcpy(errorMsg, "Failed to Create New Font Item");
-		}
-		default:break;
-	}
-	
-	bool result = GuiMessageBox(
-		GetCenteredRect(DEF_ERR_WIN_WIDTH, DEF_ERR_WIN_HEIGHT), 
-		GuiIconText(ICON_WARNING, "Fatal Error Occured"), 
-		errorMsg, 
-		"Close"
-	) != -1;
+    char errorMsg[128];
+    char errTitle[128] = {0};
 
-	return result;
+    switch (ui->apperr) {
+    case APPERR_NEWITEM_ALLOC: {
+        strcpy(errorMsg, "Failed to Create New Font Item");
+        strcpy(
+            errTitle,
+            GuiIconText(ICON_WARNING, "Fatal Memory Allocation Error Occured")
+        );
+        break;
+    }
+    case APPERR_FONTLIST_ADD: {
+        strcpy(errorMsg, "Failed to add newly created font to list");
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+
+    if (strlen(errTitle) == 0) {
+        strcpy(errTitle, GuiIconText(ICON_WARNING, "Fatal Error Occured"));
+    }
+
+    bool result = GuiMessageBox(
+                      GetCenteredRect(DEF_ERR_WIN_WIDTH, DEF_ERR_WIN_HEIGHT),
+                      errTitle, errorMsg, "Close"
+                  ) != -1;
+
+    return result;
 }
 
 bool isCanvasBtnClicked(Rectangle rect) {
@@ -407,7 +426,7 @@ void canvasLayout(Gui *ui, Rectangle panel) {
     }
 }
 
-char cc[128] = {0};
+// char cc[128] = {0};
 
 void canvasPanel(Gui *ui) {
 
@@ -415,13 +434,13 @@ void canvasPanel(Gui *ui) {
                ui->conf->itemListWidth + ITEM_PANEL_MARGIN +
                CANVAS_PANEL_MARGIN;
 
-    Rectangle canvasPanelRect =
-        (Rectangle){xpos, ui->conf->toolbarHeight + ITEM_PANEL_MARGIN,
-                    ui->winWidth - xpos - (ITEM_PANEL_MARGIN),
-                    ui->winHeight - ui->conf->toolbarHeight -
-                        ui->conf->statusbarHeight - ITEM_PANEL_MARGIN * 2
+    Rectangle canvasPanelRect = (Rectangle){
+        xpos, ui->conf->toolbarHeight + ITEM_PANEL_MARGIN,
+        ui->winWidth - xpos - (ITEM_PANEL_MARGIN),
+        ui->winHeight - ui->conf->toolbarHeight - ui->conf->statusbarHeight -
+            ITEM_PANEL_MARGIN * 2
 
-        };
+    };
 
     canvasLayout(ui, canvasPanelRect);
 
@@ -440,7 +459,7 @@ void StatusBarLayout(Gui *ui) {
         },
         TextFormat(
             "[%d, %d] | %s (0x%x)", gridPosX, gridPosY, hoveredFontItem->name,
-            hoveredFontItem->nameValue
+            hoveredFontItem->value
         )
     );
 }

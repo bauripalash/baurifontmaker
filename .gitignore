@@ -4,6 +4,9 @@ build/
 valgrind.log
 infer-out/
 cppcheck-result.txt
+massif.out.*
+*.perf
+perf.data
 ##### C.gitignore #####
 # Prerequisites
 *.d

@@ -19,9 +19,10 @@ typedef enum {
 } GuiPrelimError;
 
 typedef enum {
-	APPERR_OK = 0,
-	APPERR_NEWITEM_ALLOC,
-}AppError;
+    APPERR_OK = 0,
+    APPERR_NEWITEM_ALLOC,
+    APPERR_FONTLIST_ADD,
+} AppError;
 
 typedef struct Gui {
     int winWidth;
@@ -36,7 +37,7 @@ typedef struct Gui {
     Vector2 itemListAnchor;
     FontItemList *items;
     FontItem *currentItem;
-	AppError apperr;
+    AppError apperr;
 
 } Gui;
 

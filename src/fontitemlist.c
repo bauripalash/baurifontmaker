@@ -1,14 +1,15 @@
 #include "include/fontitemlist.h"
+#include "include/balloc.h"
 #include "include/ext/raylib.h"
 #include "include/fontitem.h"
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 /// Font Item List Functions
 
 FontItemList *NewFontItemList() {
-    FontItemList *fl = (FontItemList *)malloc(sizeof(FontItemList));
+    FontItemList *fl = (FontItemList *)balloc(sizeof(FontItemList));
     if (fl == NULL) {
         TraceLog(
             LOG_ERROR, "Font Item List allocation failed while creating struct"
@@ -18,7 +19,7 @@ FontItemList *NewFontItemList() {
     fl->len = 0;
     fl->cap = 10;
 
-    fl->items = malloc(fl->cap * sizeof(FontItem *));
+    fl->items = balloc(fl->cap * sizeof(FontItem *));
 
     if (fl->items == NULL) {
         TraceLog(
@@ -26,44 +27,59 @@ FontItemList *NewFontItemList() {
             "Font item List allocation failed while creating item list"
         );
 
-        free(fl);
+        bfree(fl);
         return NULL;
     }
 
-    fl->names = malloc(fl->cap * sizeof(const char **));
+    fl->names = balloc(fl->cap * sizeof(const char **));
 
     if (fl->names == NULL) {
         TraceLog(
             LOG_ERROR,
             "Font Item List allocation failed while creating names list"
         );
-        free(fl->items);
-        free(fl);
+        bfree(fl->items);
+        bfree(fl);
         return NULL;
     }
 
     return fl;
 }
 
-void resizeFontItemList(FontItemList *fl) {
+bool resizeFontItemList(FontItemList *fl) {
     if (fl->len >= fl->cap) {
         fl->cap *= 2;
-        FontItem **newItems = realloc(fl->items, fl->cap * sizeof(FontItem *));
+        FontItem **newItems = brealloc(fl->items, fl->cap * sizeof(FontItem *));
+        if (newItems == NULL) {
+            TraceLog(LOG_ERROR, "Failed to increase size of font item list");
+            return false;
+        }
         const char **newNames =
-            realloc(fl->names, fl->cap * sizeof(const char *));
-        // TODO: Error check
+            brealloc(fl->names, fl->cap * sizeof(const char *));
+        if (newNames == NULL) {
+            TraceLog(
+                LOG_ERROR, "Failed to increase size of font item name list"
+            );
+            return false;
+        }
         fl->items = newItems;
         fl->names = newNames;
     }
+
+    return true;
 }
 
-void AddToFontItemList(FontItemList *fl, FontItem *item) {
-    resizeFontItemList(fl);
+bool AddToFontItemList(FontItemList *fl, FontItem *item) {
+    if (!resizeFontItemList(fl)) {
+        return false;
+    }
 
     fl->items[fl->len] = item;
     fl->names[fl->len] = item->name;
     item->listIndex = fl->len;
     fl->len++;
+
+    return true;
 }
 
 void IndexFontItemList(FontItemList *fl, const char *name); // TODO:
@@ -119,7 +135,7 @@ void FreeFontItemList(FontItemList *fl) {
         FreeFontItem(fl->items[i]);
     }
 
-    free(fl->items);
-    free(fl->names);
-    free(fl);
+    bfree(fl->items);
+    bfree(fl->names);
+    bfree(fl);
 }

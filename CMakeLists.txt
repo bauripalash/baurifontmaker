@@ -33,6 +33,8 @@ if (APPLE)
 	add_compile_definitions(BFM_OS_MAC)
 endif()
 
+add_compile_definitions(BALLOC_DEBUG)
+
 
 # ====== Raylib & Raygui Stuff ======
 

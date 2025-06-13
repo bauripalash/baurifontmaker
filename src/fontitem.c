@@ -1,28 +1,29 @@
 #include "include/fontitem.h"
 #include "include/ext/raylib.h"
 
+#include "include/balloc.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 FontItem *NewFontItem(const char *name) {
-    FontItem *fi = (FontItem *)calloc(1, sizeof(FontItem));
+    FontItem *fi = (FontItem *)bcalloc(1, sizeof(FontItem));
     if (fi == NULL) {
         TraceLog(LOG_ERROR, "Failed to allocate memory for new Font Item");
         return NULL;
     }
-    fi->name = (char *)malloc((strlen(name) + 1) * sizeof(char));
+    fi->name = (char *)balloc((strlen(name) + 1) * sizeof(char));
 
     if (fi->name == NULL) {
         TraceLog(LOG_ERROR, "Failed to allocate memory for font item's name");
-        free(fi);
+        bfree(fi);
         return NULL;
     }
 
     TextCopy(fi->name, name);
-    fi->nameValue = 0x0;
+    fi->value = 0x0;
     fi->listIndex = 0;
 
     return fi;
@@ -32,11 +33,11 @@ void FreeFontItem(FontItem *fi) {
         return;
     }
     if (fi->name != NULL) {
-        free(fi->name);
+        bfree(fi->name);
     }
-    free(fi);
+    bfree(fi);
 }
-void SetNameValue(FontItem *fi, int value) { fi->nameValue = value; }
+void SetFontValue(FontItem *fi, int value) { fi->value = value; }
 
 uint8_t FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row) {
     uint8_t val = fi->bits[row];
@@ -52,7 +53,7 @@ bool FontItemGetFlip(const FontItem *fi, uint8_t col, uint8_t row) {
 }
 
 uint8_t *GetFlippedIndexes(const FontItem *fi, int *length) {
-    uint8_t *result = (uint8_t *)calloc(64, sizeof(uint8_t));
+    uint8_t *result = (uint8_t *)bcalloc(64, sizeof(uint8_t));
 
     *length = 0;
 

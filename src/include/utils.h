@@ -8,7 +8,9 @@
 #define OS_NAME_MAC   2
 #define OS_NAME_WEB   3
 
+void SeedRandom();
 bool IsValidHex(const char *str);
+bool RandomBool();
 
 // Os Check
 // Injected defination from cmake or zig build system

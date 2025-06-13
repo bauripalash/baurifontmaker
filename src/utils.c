@@ -4,7 +4,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+void SeedRandom() { srand((unsigned)time(NULL)); }
+
+bool RandomBool() { return (rand() & 1) != 0; }
 
 bool IsValidHex(const char *str) {
     if (strcmp(str, "") == 0) {
