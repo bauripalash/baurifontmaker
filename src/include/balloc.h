@@ -24,7 +24,7 @@ static size_t alloc_total_blocks = 0;
 
 static inline void *ballocImpl(size_t size, const char *f, int l) {
     void *ptr = NULL;
-    printf("Mem -> %zu\n", alloc_total_bytes);
+    //printf("Mem -> %zu\n", alloc_total_bytes);
 #ifdef BALLOC_MOCK_ALLOC_FAIL
     if (alloc_total_bytes < BALLOC_MOCK_ALLOC_LIMIT) {
         ptr = malloc(size);

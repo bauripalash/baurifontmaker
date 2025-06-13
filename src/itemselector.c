@@ -2,7 +2,6 @@
 #include "include/ext/raygui.h"
 #include "include/ext/raylib.h"
 #include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
 
 #define NEW_BTN_ID  0

@@ -16,6 +16,10 @@ zrun:
 cbuild:
 	cmake --build build
 
+.PHONY: cbuild_rls
+cbuild_rls:
+	cmake --build build --config Release
+
 .PHONY: crun
 crun: cbuild
 	./$(CMAKE_OUTPUT)
@@ -67,3 +71,5 @@ cmake_clean:
 
 .PHONY: clean
 clean: cmake_clean
+	rm -rf .zig-cache
+	rm -rf zig-out

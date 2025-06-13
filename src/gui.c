@@ -212,7 +212,9 @@ void GuiMain() {
         EndDrawing();
     }
 
+#ifdef BALLOC_DEBUG
     MemStats();
+#endif
     FreeGui(ui);
     FreeStyles();
     CloseWindow();
