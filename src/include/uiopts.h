@@ -14,12 +14,16 @@ typedef struct {
     bool enableGrid;
     int gridThickness;
     Vector2 gridSize;
+    Color gridColor;
 
     float toolbarHeight;
     float statusbarHeight;
 
     float itemListWidth;
     bool isPopupActive;
+
+    Color canvasCellColor;
+    Color canvasFillColor;
 
 } UiConfig;
 

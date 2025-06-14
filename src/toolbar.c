@@ -21,7 +21,7 @@ ToolbarState CreateToolbar(int height) {
     };
 }
 
-void SetToolnarHeight(ToolbarState *state, int height) {
+void SetToolbarHeight(ToolbarState *state, int height) {
     state->bounds.height = height;
 }
 

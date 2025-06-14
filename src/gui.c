@@ -15,10 +15,10 @@
 #define BALLOC_IMPL
 #include "include/balloc.h"
 
+#include "include/themes/theme.h"
+
 #define RAYGUI_IMPLEMENTATION
 #include "include/ext/raygui.h"
-
-#include "include/ext/lightbfm.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -31,12 +31,8 @@ bool ShowPrelimErrorMsg(GuiPrelimError err);
 void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
 void ToolBarLayout(Gui *ui);
-
 void ItemSelectorLayout(Gui *ui);
-
-void canvasPanel(Gui *ui);
-void canvasLayout(Gui *ui, Rectangle panel);
-
+void CanvasLayout(Gui *ui);
 bool handleAppError(const Gui *ui);
 
 int gridPosX = 0;
@@ -166,9 +162,9 @@ bool ShowPrelimErrorMsg(GuiPrelimError err) {
     return clicked;
 }
 
-void ClearAppError(Gui *ui) { ui->apperr = APPERR_OK; }
+void clearAppError(Gui *ui) { ui->apperr = APPERR_OK; }
 
-bool HasAppError(Gui *ui) { return ui->apperr != APPERR_OK; }
+bool hasAppError(const Gui *ui) { return ui->apperr != APPERR_OK; }
 
 void GuiMain() {
     SeedRandom();
@@ -177,7 +173,8 @@ void GuiMain() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(DEF_WIN_WIDTH, DEF_WIN_HEIGHT, DEF_WIN_TITLE);
     SetWindowMinSize(DEF_WIN_WIDTH, DEF_WIN_HEIGHT);
-    GuiLoadStyleLightBFM();
+    LoadAppFont();
+    LoadAppLightTheme();
 
     GuiPrelimError err;
 
@@ -197,7 +194,7 @@ void GuiMain() {
     while (!WindowShouldClose()) {
         BeginDrawing();
         {
-            ClearBackground(ColorBg);
+            ClearBackground(ColorBackground);
             if (err != PRELIM_OK) {
                 bool clicked = ShowPrelimErrorMsg(err);
                 EndDrawing();
@@ -288,7 +285,7 @@ void Layout(Gui *ui) {
     ui->conf->isPopupActive =
         (ui->states->newItem.windowActive || ui->states->editItem.windowActive);
 
-    if (ui->conf->isPopupActive || HasAppError(ui)) {
+    if (ui->conf->isPopupActive || hasAppError(ui)) {
 
         GuiLock();
         FillScrenForPopup(ui);
@@ -296,7 +293,7 @@ void Layout(Gui *ui) {
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
-    canvasPanel(ui);
+    CanvasLayout(ui);
     ItemSelector(&ui->states->itemSelector, ui->items->names, ui->items->len);
     handleItemSelector(ui);
     StatusBarLayout(ui);
@@ -317,9 +314,9 @@ void Layout(Gui *ui) {
         }
     }
 
-    if (HasAppError(ui)) {
+    if (hasAppError(ui)) {
         if (handleAppError(ui)) {
-            ClearAppError(ui);
+            clearAppError(ui);
         }
     }
 }
@@ -379,7 +376,7 @@ bool isHoverBtn(Rectangle rect) {
     return CheckCollisionPointRec(GetMousePosition(), rect);
 }
 
-void canvasLayout(Gui *ui, Rectangle panel) {
+void canvasDrawArea(Gui *ui, Rectangle panel) {
 
     int gridW = (int)ui->conf->gridSize.x * ui->conf->gridBtnSize +
                 ((int)ui->conf->gridSize.x + 1) * ui->conf->gridThickness;
@@ -392,7 +389,9 @@ void canvasLayout(Gui *ui, Rectangle panel) {
     int gridY = panelCenterY - gridH * 0.5f;
 
     if (ui->conf->enableGrid) {
-        DrawRectangleRec((Rectangle){gridX, gridY, gridW, gridH}, ColorBlack);
+        DrawRectangleRec(
+            (Rectangle){gridX, gridY, gridW, gridH}, ui->conf->gridColor
+        );
     }
 
     int btnIndex = 0;
@@ -417,10 +416,10 @@ void canvasLayout(Gui *ui, Rectangle panel) {
                 gridPosX = col;
                 gridPosY = row;
             }
-            Color clr = ColorWhite;
+            Color clr = ui->conf->canvasCellColor;
 
             if (FontItemGetFlip(ui->currentItem, col, row)) {
-                clr = ColorBlack;
+                clr = ui->conf->canvasFillColor;
             }
             DrawRectangleRec(btnRect, clr);
             btnIndex++;
@@ -430,7 +429,7 @@ void canvasLayout(Gui *ui, Rectangle panel) {
 
 // char cc[128] = {0};
 
-void canvasPanel(Gui *ui) {
+void CanvasLayout(Gui *ui) {
 
     int xpos = ui->itemListAnchor.x + ITEM_PANEL_MARGIN +
                ui->conf->itemListWidth + ITEM_PANEL_MARGIN +
@@ -444,7 +443,7 @@ void canvasPanel(Gui *ui) {
 
     };
 
-    canvasLayout(ui, canvasPanelRect);
+    canvasDrawArea(ui, canvasPanelRect);
 
     GuiGroupBox(canvasPanelRect, "~canvas");
 }

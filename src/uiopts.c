@@ -1,5 +1,6 @@
 #include "include/uiopts.h"
 #include "include/balloc.h"
+#include "include/colors.h"
 #include "include/defaults.h"
 #include "include/ext/raylib.h"
 #include "include/itemselector.h"
@@ -21,6 +22,9 @@ UiConfig *NewUiConfig() {
     uc->statusbarHeight = DEF_STATUSBAR_HEIGHT;
     uc->itemListWidth = DEF_ITEMLIST_WIDTH;
     uc->gridSize = (Vector2){.x = DEF_CANVAS_COLUMN, .y = DEF_CANVAS_ROW};
+    uc->gridColor = ColorPrimary;
+    uc->canvasCellColor = ColorBackground;
+    uc->canvasFillColor = ColorPrimary;
     uc->isPopupActive = false;
 
     return uc;
