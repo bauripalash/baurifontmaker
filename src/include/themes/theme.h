@@ -7,7 +7,7 @@
 #include "ibmplexmonofont.h"
 // clang-format on
 
-#define LIGHT_PROP_COUNT 26
+#define LIGHT_PROP_COUNT 32
 static const GuiStyleProp LightThemeProps[LIGHT_PROP_COUNT] = {
     {DEFAULT, TEXT_LINE_SPACING, (int)24},
     {DEFAULT, BACKGROUND_COLOR, HexColorBackground},
@@ -40,9 +40,18 @@ static const GuiStyleProp LightThemeProps[LIGHT_PROP_COUNT] = {
     {LISTVIEW, BORDER_COLOR_PRESSED, HexColorPrimary},
     {LISTVIEW, BASE_COLOR_FOCUSED, HexColorGrayLightest},
     {LISTVIEW, BASE_COLOR_PRESSED, HexColorBlueDarkT},
+
+	{TEXTBOX, BASE_COLOR_PRESSED, HexColorBackground},
+	{TEXTBOX, TEXT_COLOR_PRESSED, HexColorPrimary},
+	{TEXTBOX, TEXT_COLOR_NORMAL, HexColorPrimary},
+	{TEXTBOX, TEXT_COLOR_FOCUSED, HexColorPrimary},
+	{TEXTBOX, BORDER_COLOR_PRESSED, HexColorGrayLighter},
+	{TEXTBOX, BORDER_COLOR_FOCUSED, HexColorGrayDarkest},
 };
 
-void LoadAppFont() { GuiLoadStyleIBMPlexMonoFont(); }
+void LoadAppFont() {
+	GuiLoadStyleIBMPlexMonoFont();
+}
 
 // void LoadAppLightTheme();
 void LoadAppDarkTheme();

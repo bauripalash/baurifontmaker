@@ -25,6 +25,9 @@
 #define HexColorBrownDark    (int)0x561920ff
 #define HexColorBrownLight   (int)0x954a44ff
 #define HexColorBlueDarkT    (int)0x3672d47d
+#define HexColorBlueLightT (int)0x45b4d0aa
+
+
 
 // Note: Above declared hex are only used for GuiSetStyle(...) functions
 
