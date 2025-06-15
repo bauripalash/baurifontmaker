@@ -7,6 +7,7 @@
 #include "include/toolbar.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
+#include "include/windows/settings.h"
 #include <stdbool.h>
 
 UiConfig *NewUiConfig() {
@@ -47,6 +48,8 @@ UiStates *NewUiStates() {
     states->itemSelector = CreateItemSelector(
         DEF_ITEMLIST_WIDTH, DEF_TOOLBAR_HEIGHT, DEF_STATUSBAR_HEIGHT
     );
+
+    states->settings = CreateSettingsState();
 
     return states;
 }

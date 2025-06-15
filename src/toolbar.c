@@ -18,6 +18,8 @@ ToolbarState CreateToolbar(int height) {
         .newBtnClicked = false,
         .openBtnClicked = false,
         .saveBtnClicked = false,
+        .settingsBtnClicked = false,
+        .helpBtnClicked = false,
     };
 }
 
@@ -50,7 +52,8 @@ void Toolbar(ToolbarState *state) {
 
     btnBound.x = state->bounds.width - TOOL_MARGIN - btnBound.width;
 
-    GuiButton(btnBound, GuiIconText(ICON_HELP, NULL));
+    state->helpBtnClicked = GuiButton(btnBound, GuiIconText(ICON_HELP, NULL));
     btnBound.x -= TOOL_MARGIN * 2 + btnBound.width;
-    GuiButton(btnBound, GuiIconText(ICON_GEAR, NULL));
+    state->settingsBtnClicked =
+        GuiButton(btnBound, GuiIconText(ICON_GEAR, NULL));
 }

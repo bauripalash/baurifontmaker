@@ -11,6 +11,7 @@
 #include "include/utils.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
+#include "include/windows/settings.h"
 
 #define BALLOC_IMPL
 #include "include/balloc.h"
@@ -166,6 +167,15 @@ void clearAppError(Gui *ui) { ui->apperr = APPERR_OK; }
 
 bool hasAppError(const Gui *ui) { return ui->apperr != APPERR_OK; }
 
+void setupStates(Gui *ui) {
+    if (ui->states == NULL || ui->conf == NULL) {
+        return;
+    }
+
+    ui->states->settings.gridThickness = ui->conf->gridThickness;
+    ui->states->settings.enableGrid = ui->conf->enableGrid;
+}
+
 void GuiMain() {
     SeedRandom();
 
@@ -184,11 +194,14 @@ void GuiMain() {
 
     if (ui != NULL) {
         ui->states = NewUiStates();
+
         if (ui->states == NULL) {
             if (err == PRELIM_OK) {
                 err = PRELIM_STATES_ALLOC_FAILED;
             }
         }
+
+        setupStates(ui);
     }
 
     while (!WindowShouldClose()) {
@@ -277,13 +290,60 @@ void handleItemSelector(Gui *ui) {
     ui->currentItem = ui->items->items[ui->states->itemSelector.active];
 }
 
-void newFileDialog(Gui *ui) {}
+void updateConfigFromSettings(Gui *ui) {
+    ui->conf->gridSize.y = ui->states->settings.canvasRow;
+    ui->conf->gridSize.x = ui->states->settings.canvasColumn;
+    ui->conf->gridThickness = ui->states->settings.gridThickness;
+    ui->conf->enableGrid = ui->states->settings.enableGrid;
+}
+void handleSettingsDialog(Gui *ui) {
+    if (ui->states->settings.windowActive) {
+        bool result = SettingsWindow(&ui->states->settings);
+        if (result) {
+            LogSettings(&ui->states->settings);
+            updateConfigFromSettings(ui);
+        }
+    }
+}
+
+void handleOpenFileDialog(Gui *ui) {
+    bool ok = OpenFileDialog(
+        "Open Font File", ui->openFilename, "*.bfont;*.baufnt;*.txt",
+        "BauriFontMaker Font Files (*.bfont)"
+    );
+
+    if (ok) {
+        printf("Open File -> %s\n", ui->openFilename);
+    }
+}
+
+void updateConfigToSettings(Gui *ui) {
+    ui->states->settings.canvasRow = (int)ui->conf->gridSize.y;
+    ui->states->settings.canvasColumn = (int)ui->conf->gridSize.x;
+    ui->states->settings.gridThickness = ui->conf->gridThickness;
+    ui->states->settings.enableGrid = ui->conf->enableGrid;
+}
+
+void handleToolbar(Gui *ui) {
+    if (ui->states->toolbar.openBtnClicked) {
+        handleOpenFileDialog(ui);
+    }
+
+    if (ui->states->toolbar.settingsBtnClicked) {
+        updateConfigToSettings(ui);
+        ui->states->settings.windowActive = true;
+    }
+
+    handleSettingsDialog(ui);
+}
 
 void Layout(Gui *ui) {
     GuiEnableTooltip();
 
     ui->conf->isPopupActive =
-        (ui->states->newItem.windowActive || ui->states->editItem.windowActive);
+        (ui->states->newItem.windowActive ||
+         ui->states->editItem.windowActive ||
+         ui->states->settings.windowActive);
 
     if (ui->conf->isPopupActive || hasAppError(ui)) {
 
@@ -302,17 +362,7 @@ void Layout(Gui *ui) {
 
     handleNewItemWindow(ui);
     handleEditItemWindow(ui);
-
-    if (ui->states->toolbar.openBtnClicked) {
-        bool ok = OpenFileDialog(
-            "Open Font File", ui->openFilename, "*.bfont;*.baufnt;*.txt",
-            "BauriFontMaker Font Files (*.bfont)"
-        );
-
-        if (ok) {
-            printf("Open File -> %s\n", ui->openFilename);
-        }
-    }
+    handleToolbar(ui);
 
     if (hasAppError(ui)) {
         if (handleAppError(ui)) {
@@ -378,10 +428,13 @@ bool isHoverBtn(Rectangle rect) {
 
 void canvasDrawArea(Gui *ui, Rectangle panel) {
 
-    int gridW = (int)ui->conf->gridSize.x * ui->conf->gridBtnSize +
-                ((int)ui->conf->gridSize.x + 1) * ui->conf->gridThickness;
-    int gridH = (int)ui->conf->gridSize.y * ui->conf->gridBtnSize +
-                ((int)ui->conf->gridSize.y + 1) * ui->conf->gridThickness;
+    const int gridRow = (int)ui->conf->gridSize.y;
+    const int gridCol = (int)ui->conf->gridSize.x;
+    const int btnSize = ui->conf->gridBtnSize;
+    const int thickness = ui->conf->enableGrid ? ui->conf->gridThickness : 0;
+
+    int gridW = (gridCol * btnSize) + (gridCol + 1) * thickness;
+    int gridH = (gridRow * btnSize) + (gridRow + 1) * thickness;
     int panelCenterX = panel.x + panel.width * 0.5f;
     int panelCenterY = panel.y + panel.height * 0.5f;
 
@@ -397,16 +450,10 @@ void canvasDrawArea(Gui *ui, Rectangle panel) {
     int btnIndex = 0;
     for (int row = 0; row < (int)ui->conf->gridSize.y; row++) {
         for (int col = 0; col < (int)ui->conf->gridSize.x; col++) {
-            int btnX =
-                (gridX + ui->conf->gridThickness) +
-                (col * (ui->conf->gridBtnSize + ui->conf->gridThickness));
-            int btnY =
-                (gridY + ui->conf->gridThickness) +
-                (row * (ui->conf->gridBtnSize + ui->conf->gridThickness));
+            int btnX = (gridX + thickness) + (col * (btnSize + thickness));
+            int btnY = (gridY + thickness) + (row * (btnSize + thickness));
 
-            Rectangle btnRect = {
-                btnX, btnY, ui->conf->gridBtnSize, ui->conf->gridBtnSize
-            };
+            Rectangle btnRect = {btnX, btnY, btnSize, btnSize};
 
             if (isCanvasBtnClicked(btnRect)) {
                 FontItemFlipBit(ui->currentItem, col, row);
@@ -425,6 +472,17 @@ void canvasDrawArea(Gui *ui, Rectangle panel) {
             btnIndex++;
         }
     }
+
+    const int outlineThickness = (thickness > 0 ? thickness : 2);
+    DrawRectangleLinesEx(
+        (Rectangle){
+            gridX,
+            gridY,
+            gridW,
+            gridH,
+        },
+        outlineThickness, ui->conf->gridColor
+    );
 }
 
 // char cc[128] = {0};

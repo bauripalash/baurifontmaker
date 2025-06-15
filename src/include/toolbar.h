@@ -14,6 +14,8 @@ typedef struct {
     bool newBtnClicked;
     bool openBtnClicked;
     bool saveBtnClicked;
+    bool settingsBtnClicked;
+    bool helpBtnClicked;
 } ToolbarState;
 
 ToolbarState CreateToolbar(int height);

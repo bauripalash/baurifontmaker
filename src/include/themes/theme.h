@@ -41,17 +41,15 @@ static const GuiStyleProp LightThemeProps[LIGHT_PROP_COUNT] = {
     {LISTVIEW, BASE_COLOR_FOCUSED, HexColorGrayLightest},
     {LISTVIEW, BASE_COLOR_PRESSED, HexColorBlueDarkT},
 
-	{TEXTBOX, BASE_COLOR_PRESSED, HexColorBackground},
-	{TEXTBOX, TEXT_COLOR_PRESSED, HexColorPrimary},
-	{TEXTBOX, TEXT_COLOR_NORMAL, HexColorPrimary},
-	{TEXTBOX, TEXT_COLOR_FOCUSED, HexColorPrimary},
-	{TEXTBOX, BORDER_COLOR_PRESSED, HexColorGrayLighter},
-	{TEXTBOX, BORDER_COLOR_FOCUSED, HexColorGrayDarkest},
+    {TEXTBOX, BASE_COLOR_PRESSED, HexColorBackground},
+    {TEXTBOX, TEXT_COLOR_PRESSED, HexColorPrimary},
+    {TEXTBOX, TEXT_COLOR_NORMAL, HexColorPrimary},
+    {TEXTBOX, TEXT_COLOR_FOCUSED, HexColorPrimary},
+    {TEXTBOX, BORDER_COLOR_PRESSED, HexColorGrayLighter},
+    {TEXTBOX, BORDER_COLOR_FOCUSED, HexColorGrayDarkest},
 };
 
-void LoadAppFont() {
-	GuiLoadStyleIBMPlexMonoFont();
-}
+void LoadAppFont() { GuiLoadStyleIBMPlexMonoFont(); }
 
 // void LoadAppLightTheme();
 void LoadAppDarkTheme();

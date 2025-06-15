@@ -8,6 +8,7 @@
 #include "toolbar.h"
 #include "windows/edititem.h"
 #include "windows/newitem.h"
+#include "windows/settings.h"
 
 typedef struct {
     int gridBtnSize;
@@ -32,6 +33,7 @@ typedef struct {
     ItemSelectorState itemSelector;
     NewItemState newItem;
     EditItemState editItem;
+    SettingsState settings;
 } UiStates;
 
 UiConfig *NewUiConfig();
