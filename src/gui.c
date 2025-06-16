@@ -1,21 +1,23 @@
 #include "include/gui.h"
 #include "include/colors.h"
+#include "include/config.h"
 #include "include/defaults.h"
 #include "include/ext/raylib.h"
-#include "include/filedialog.h"
-#include "include/fontitem.h"
-#include "include/fontitemlist.h"
-#include "include/itemselector.h"
-#include "include/toolbar.h"
-#include "include/uiopts.h"
+#include "include/objects/fontitem.h"
+#include "include/objects/fontitemlist.h"
+#include "include/objects/uiconfig.h"
+#include "include/objects/uistates.h"
 #include "include/utils.h"
+#include "include/widgets/canvas.h"
+#include "include/widgets/filedialog.h"
+#include "include/widgets/itemselector.h"
+#include "include/widgets/toolbar.h"
 #include "include/windows/edititem.h"
 #include "include/windows/newitem.h"
 #include "include/windows/settings.h"
 
 #define BALLOC_IMPL
 #include "include/balloc.h"
-
 #include "include/themes/theme.h"
 
 #define RAYGUI_IMPLEMENTATION
@@ -25,24 +27,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MARGIN              20 // Canvas Margin
-#define CANVAS_PANEL_MARGIN 10
+#define MARGIN 20 // Canvas Margin
 
 bool ShowPrelimErrorMsg(GuiPrelimError err);
+bool DrawWindow(Gui *ui, GuiPrelimError *err);
 void Layout(Gui *ui);
 void StatusBarLayout(Gui *ui);
-void ToolBarLayout(Gui *ui);
-void ItemSelectorLayout(Gui *ui);
-void CanvasLayout(Gui *ui);
 bool handleAppError(const Gui *ui);
-
-int gridPosX = 0;
-int gridPosY = 0;
-
-int canvasWidth = 0;
-int canvasHeight = 0;
-
-bool hasError = false;
 
 Gui *NewGUI(GuiPrelimError *err) {
     Gui *ui = (Gui *)balloc(sizeof(Gui));
@@ -176,6 +167,8 @@ void setupStates(Gui *ui) {
     ui->states->settings.enableGrid = ui->conf->enableGrid;
 }
 
+void handleConfig(Gui *ui) { bool isok = LoadConfigFromFile(ui->conf, NULL); }
+
 void GuiMain() {
     SeedRandom();
 
@@ -204,6 +197,8 @@ void GuiMain() {
         setupStates(ui);
     }
 
+    handleConfig(ui);
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         {
@@ -228,6 +223,25 @@ void GuiMain() {
     FreeGui(ui);
     FreeStyles();
     CloseWindow();
+}
+
+bool DrawWindow(Gui *ui, GuiPrelimError *err) {
+    BeginDrawing();
+    {
+        ClearBackground(ColorBackground);
+        if (err != PRELIM_OK) {
+            bool clicked = ShowPrelimErrorMsg(*err);
+            EndDrawing();
+
+            if (clicked) {
+                return false;
+            }
+        }
+        UpdateData(ui);
+        Layout(ui);
+    }
+    EndDrawing();
+    return true;
 }
 
 void FillScrenForPopup(const Gui *ui) {
@@ -302,6 +316,7 @@ void handleSettingsDialog(Gui *ui) {
         if (result) {
             LogSettings(&ui->states->settings);
             updateConfigFromSettings(ui);
+            SaveConfigToFile(ui->conf, NULL);
         }
     }
 }
@@ -353,7 +368,7 @@ void Layout(Gui *ui) {
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
-    CanvasLayout(ui);
+    Canvas(&ui->states->canvas, ui->conf, ui->currentItem);
     ItemSelector(&ui->states->itemSelector, ui->items->names, ui->items->len);
     handleItemSelector(ui);
     StatusBarLayout(ui);
@@ -407,107 +422,10 @@ bool handleAppError(const Gui *ui) {
     return result;
 }
 
-bool isCanvasBtnClicked(Rectangle rect) {
-    if (GuiIsLocked()) {
-        return false;
-    }
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-        CheckCollisionPointRec(GetMousePosition(), rect)) {
-        return true;
-    }
-
-    return false;
-}
-
-bool isHoverBtn(Rectangle rect) {
-    if (GuiIsLocked()) {
-        return false;
-    }
-    return CheckCollisionPointRec(GetMousePosition(), rect);
-}
-
-void canvasDrawArea(Gui *ui, Rectangle panel) {
-
-    const int gridRow = (int)ui->conf->gridSize.y;
-    const int gridCol = (int)ui->conf->gridSize.x;
-    const int btnSize = ui->conf->gridBtnSize;
-    const int thickness = ui->conf->enableGrid ? ui->conf->gridThickness : 0;
-
-    int gridW = (gridCol * btnSize) + (gridCol + 1) * thickness;
-    int gridH = (gridRow * btnSize) + (gridRow + 1) * thickness;
-    int panelCenterX = panel.x + panel.width * 0.5f;
-    int panelCenterY = panel.y + panel.height * 0.5f;
-
-    int gridX = panelCenterX - gridW * 0.5f;
-    int gridY = panelCenterY - gridH * 0.5f;
-
-    if (ui->conf->enableGrid) {
-        DrawRectangleRec(
-            (Rectangle){gridX, gridY, gridW, gridH}, ui->conf->gridColor
-        );
-    }
-
-    int btnIndex = 0;
-    for (int row = 0; row < (int)ui->conf->gridSize.y; row++) {
-        for (int col = 0; col < (int)ui->conf->gridSize.x; col++) {
-            int btnX = (gridX + thickness) + (col * (btnSize + thickness));
-            int btnY = (gridY + thickness) + (row * (btnSize + thickness));
-
-            Rectangle btnRect = {btnX, btnY, btnSize, btnSize};
-
-            if (isCanvasBtnClicked(btnRect)) {
-                FontItemFlipBit(ui->currentItem, col, row);
-            }
-
-            if (isHoverBtn(btnRect)) {
-                gridPosX = col;
-                gridPosY = row;
-            }
-            Color clr = ui->conf->canvasCellColor;
-
-            if (FontItemGetFlip(ui->currentItem, col, row)) {
-                clr = ui->conf->canvasFillColor;
-            }
-            DrawRectangleRec(btnRect, clr);
-            btnIndex++;
-        }
-    }
-
-    const int outlineThickness = (thickness > 0 ? thickness : 2);
-    DrawRectangleLinesEx(
-        (Rectangle){
-            gridX,
-            gridY,
-            gridW,
-            gridH,
-        },
-        outlineThickness, ui->conf->gridColor
-    );
-}
-
-// char cc[128] = {0};
-
-void CanvasLayout(Gui *ui) {
-
-    int xpos = ui->itemListAnchor.x + ITEM_PANEL_MARGIN +
-               ui->conf->itemListWidth + ITEM_PANEL_MARGIN +
-               CANVAS_PANEL_MARGIN;
-
-    Rectangle canvasPanelRect = (Rectangle){
-        xpos, ui->conf->toolbarHeight + ITEM_PANEL_MARGIN,
-        ui->winWidth - xpos - (ITEM_PANEL_MARGIN),
-        ui->winHeight - ui->conf->toolbarHeight - ui->conf->statusbarHeight -
-            ITEM_PANEL_MARGIN * 2
-
-    };
-
-    canvasDrawArea(ui, canvasPanelRect);
-
-    GuiGroupBox(canvasPanelRect, "~canvas");
-}
-
 void StatusBarLayout(Gui *ui) {
     int hoverIndex = ui->states->itemSelector.focus;
+    int hoverPosX = ui->states->canvas.hoverPosX;
+    int hoverPosY = ui->states->canvas.hoverPosY;
     FontItem *hoveredFontItem = ui->items->items[hoverIndex];
     GuiStatusBar(
         (Rectangle){
@@ -517,7 +435,7 @@ void StatusBarLayout(Gui *ui) {
             ui->conf->statusbarHeight,
         },
         TextFormat(
-            "[%d, %d] | %s (0x%x)", gridPosX, gridPosY, hoveredFontItem->name,
+            "[%d, %d] | %s (0x%x)", hoverPosX, hoverPosY, hoveredFontItem->name,
             hoveredFontItem->value
         )
     );

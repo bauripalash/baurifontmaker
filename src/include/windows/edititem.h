@@ -2,7 +2,7 @@
 #define WIN_EDITITEM_H
 
 #include "../ext/raylib.h"
-#include "../fontitem.h"
+#include "../objects/fontitem.h"
 
 #include <stdbool.h>
 

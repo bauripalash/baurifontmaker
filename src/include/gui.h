@@ -5,9 +5,10 @@
 #include <stdint.h>
 
 #include "ext/raylib.h"
-#include "fontitem.h"
-#include "fontitemlist.h"
-#include "uiopts.h"
+#include "objects/fontitem.h"
+#include "objects/fontitemlist.h"
+#include "objects/uiconfig.h"
+#include "objects/uistates.h"
 
 typedef enum {
     PRELIM_OK = 0,

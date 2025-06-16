@@ -1,6 +1,6 @@
-#include "include/itemselector.h"
-#include "include/ext/raygui.h"
-#include "include/ext/raylib.h"
+#include "../include/widgets/itemselector.h"
+#include "../include/ext/raygui.h"
+#include "../include/ext/raylib.h"
 #include <stdbool.h>
 #include <string.h>
 

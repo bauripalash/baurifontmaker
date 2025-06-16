@@ -1,7 +1,7 @@
-#include "include/fontitemlist.h"
-#include "include/balloc.h"
-#include "include/ext/raylib.h"
-#include "include/fontitem.h"
+#include "../include/objects/fontitemlist.h"
+#include "../include/balloc.h"
+#include "../include/ext/raylib.h"
+#include "../include/objects/fontitem.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>

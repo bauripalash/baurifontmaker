@@ -1,8 +1,9 @@
-#include "include/fontitem.h"
-#include "include/ext/raylib.h"
+#include "../include/objects/fontitem.h"
+#include "../include/ext/raylib.h"
 
-#include "include/balloc.h"
+#include "../include/balloc.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -39,11 +40,11 @@ void FreeFontItem(FontItem *fi) {
 }
 void SetFontValue(FontItem *fi, int value) { fi->value = value; }
 
-uint8_t FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row) {
+bool FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row) {
     uint8_t val = fi->bits[row];
     fi->bits[row] = val ^ (1 << (7 - col));
 
-    return val;
+    return FontItemGetFlip(fi, col, row);
 }
 bool FontItemGetFlip(const FontItem *fi, uint8_t col, uint8_t row) {
     uint8_t bts = fi->bits[row];

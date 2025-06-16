@@ -1,6 +1,8 @@
 BIN:=baurifontmaker
 CMAKE_OUTPUT:=build/$(BIN)/$(BIN)
 ZIG_OUTPUT:=zig-out/bin/$(BIN)
+HEADERS:= $(shell find src/include -path 'src/include/ext' -prune -o -path 'src/include/themes/ibm*' -prune -o -name '*.h' -print)
+SOURCES:= $(shell find src/ -path 'src/include/ext' -prune -o -name '*.c' -print)
 
 all: crun
 
@@ -31,7 +33,7 @@ csetup:
 
 .PHONY: fmt
 fmt:
-	@clang-format -i -style=file --verbose src/*.c src/windows/*.c src/include/*.h src/include/windows/*.h src/include/themes/theme.h
+	@clang-format -i -style=file --verbose $(SOURCES) $(HEADERS)
 
 .PHONY:valgrind
 valgrind: cbuild

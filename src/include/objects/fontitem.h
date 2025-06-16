@@ -17,7 +17,7 @@ FontItem *NewFontItem(const char *name);
 void FreeFontItem(FontItem *fi);
 void SetFontValue(FontItem *fi, int value);
 void SetFontName(FontItem *fi, const char *name);
-uint8_t FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row);
+bool FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row);
 bool FontItemGetFlip(const FontItem *fi, uint8_t col, uint8_t row);
 uint8_t *GetFlippedIndexes(const FontItem *fi, int *length);
 void LogFontItem(const FontItem *fi);
