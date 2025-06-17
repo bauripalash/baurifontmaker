@@ -3,8 +3,9 @@
 
 // clang-format off
 #include "../colors.h"
+#include "../exported/bgmlogo.h"
 #include "../ext/raygui.h"
-#include "ibmplexmonofont.h"
+#include "../exported/ibmplexmonofont.h"
 // clang-format on
 
 #define LIGHT_PROP_COUNT 32
@@ -50,6 +51,19 @@ static const GuiStyleProp LightThemeProps[LIGHT_PROP_COUNT] = {
 };
 
 void LoadAppFont() { GuiLoadStyleIBMPlexMonoFont(); }
+
+void SetAppIcon() {
+    Image logo = {
+        .data = BGMLOGO_DATA,
+        .width = BGMLOGO_WIDTH,
+        .height = BGMLOGO_HEIGHT,
+        .format = BGMLOGO_FORMAT,
+        .mipmaps = 1
+    };
+	
+
+    SetWindowIcon(logo);
+}
 
 // void LoadAppLightTheme();
 void LoadAppDarkTheme();

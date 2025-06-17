@@ -1,7 +1,7 @@
 BIN:=bauriglyphmaker
 CMAKE_OUTPUT:=build/$(BIN)/$(BIN)
 ZIG_OUTPUT:=zig-out/bin/$(BIN)
-HEADERS:= $(shell find src/include -path 'src/include/ext' -prune -o -path 'src/include/themes/ibm*' -prune -o -name '*.h' -print)
+HEADERS:= $(shell find src/include -path 'src/include/ext' -prune -o -path 'src/include/exported' -prune -o -name '*.h' -print)
 SOURCES:= $(shell find src/ -path 'src/include/ext' -prune -o -name '*.c' -print)
 
 all: crun

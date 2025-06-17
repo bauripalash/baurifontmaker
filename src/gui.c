@@ -168,6 +168,7 @@ void setupStates(Gui *ui) {
 
 void handleConfig(Gui *ui) { bool isok = LoadConfigFromFile(ui->conf, NULL); }
 
+
 void GuiMain() {
     SeedRandom();
 
@@ -175,9 +176,9 @@ void GuiMain() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(DEF_WIN_WIDTH, DEF_WIN_HEIGHT, DEF_WIN_TITLE);
     SetWindowMinSize(DEF_WIN_WIDTH, DEF_WIN_HEIGHT);
+	SetAppIcon();
     LoadAppFont();
     LoadAppLightTheme();
-
     GuiPrelimError err;
 
     Gui *ui = NewGUI(&err);
