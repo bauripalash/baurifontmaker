@@ -51,9 +51,7 @@ bool SaveConfigToFile(const UiConfig *config, const char *filepath) {
     rini_set_value(
         &confFile, BTN_SIZE_KEY, config->gridBtnSize, "Canvas button size"
     );
-    rini_set_value(
-        &confFile, GRID_THICKNESS_KEY, config->gridThickness, "Grid Thickness"
-    );
+
     rini_set_value(
         &confFile, TOOLBAR_HEIGHT_KEY, config->toolbarHeight, "Toolbar Height"
     );

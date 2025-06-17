@@ -6,7 +6,6 @@
 typedef struct {
     int gridBtnSize;
     bool enableGrid;
-    int gridThickness;
     Vector2 gridSize;
     Color gridColor;
 

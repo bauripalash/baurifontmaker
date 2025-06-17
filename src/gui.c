@@ -163,7 +163,6 @@ void setupStates(Gui *ui) {
         return;
     }
 
-    ui->states->settings.gridThickness = ui->conf->gridThickness;
     ui->states->settings.enableGrid = ui->conf->enableGrid;
 }
 
@@ -307,7 +306,6 @@ void handleItemSelector(Gui *ui) {
 void updateConfigFromSettings(Gui *ui) {
     ui->conf->gridSize.y = ui->states->settings.canvasRow;
     ui->conf->gridSize.x = ui->states->settings.canvasColumn;
-    ui->conf->gridThickness = ui->states->settings.gridThickness;
     ui->conf->enableGrid = ui->states->settings.enableGrid;
 }
 void handleSettingsDialog(Gui *ui) {
@@ -335,7 +333,6 @@ void handleOpenFileDialog(Gui *ui) {
 void updateConfigToSettings(Gui *ui) {
     ui->states->settings.canvasRow = (int)ui->conf->gridSize.y;
     ui->states->settings.canvasColumn = (int)ui->conf->gridSize.x;
-    ui->states->settings.gridThickness = ui->conf->gridThickness;
     ui->states->settings.enableGrid = ui->conf->enableGrid;
 }
 

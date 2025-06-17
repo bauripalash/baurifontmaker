@@ -22,7 +22,6 @@ SettingsState CreateSettingsState() {
     state.windowBounds =
         GetCenteredRect(SETTINGS_WIN_WIDTH, SETTINGS_WIN_HEIGHT);
     state.enableGrid = true;
-    state.gridThickness = DEF_GRID_THICKNESS;
     state.canvasColumn = DEF_CANVAS_COLUMN;
     state.canvasRow = DEF_CANVAS_ROW;
     strcpy(state.configPath, "");
@@ -33,7 +32,6 @@ SettingsState CreateSettingsState() {
 void LogSettings(const SettingsState *state) {
     printf("== Settings ==\n");
     printf("Enable Grid => %s\n", state->enableGrid ? "true" : "false");
-    printf("Grid Thickness => %d\n", state->gridThickness);
     printf(
         "Canvas Size => Column:%d, Row:%d\n", state->canvasColumn,
         state->canvasRow
@@ -102,28 +100,7 @@ bool SettingsWindow(SettingsState *state) {
             &state->enableGrid
         );
 
-        posY += LABEL_H + PADDING;
-
-        GuiLabel(
-            (Rectangle){
-                posX + WIN_MARGIN + PADDING, posY, LABEL_W, LABEL_H
-
-            },
-            "Grid Thickness"
-        );
-
-        GuiSpinner(
-            (Rectangle){
-                posX + SETTINGS_WIN_WIDTH - SPINNER_WIDTH - WIN_MARGIN -
-                    PADDING,
-                posY,
-                SPINNER_WIDTH,
-                LABEL_H,
-            },
-            NULL, &state->gridThickness, 0, 10, false
-        );
-
-        posY += WIN_MARGIN + LABEL_H + PADDING;
+        posY += WIN_MARGIN + 100 + PADDING;
         posX += WIN_MARGIN;
 
         bool saveClicked = GuiButton(

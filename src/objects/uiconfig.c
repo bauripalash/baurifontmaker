@@ -11,7 +11,6 @@ UiConfig *NewUiConfig() {
     }
     uc->enableGrid = true;
     uc->gridBtnSize = DEF_GRID_BTN_SIZE;
-    uc->gridThickness = DEF_GRID_THICKNESS;
     uc->toolbarHeight = DEF_TOOLBAR_HEIGHT;
     uc->statusbarHeight = DEF_STATUSBAR_HEIGHT;
     uc->itemListWidth = DEF_ITEMLIST_WIDTH;

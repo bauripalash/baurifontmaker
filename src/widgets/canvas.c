@@ -40,11 +40,9 @@ void canvasDrawArea(
     const int gridCol = (int)config->gridSize.x;
 
     const int btnSize = config->gridBtnSize;
-    const int configThickness = config->gridThickness;
-    const int thickness = config->enableGrid ? configThickness : 0;
 
-    int gridW = (gridCol * btnSize) + (gridCol + 1) * thickness;
-    int gridH = (gridRow * btnSize) + (gridRow + 1) * thickness;
+    int gridW = (gridCol * btnSize);
+    int gridH = (gridRow * btnSize);
 
     int panelCenterX = panel.x + panel.width * 0.5f;
     int panelCenterY = panel.y + panel.height * 0.5f;
@@ -59,14 +57,10 @@ void canvasDrawArea(
         gridH,
     };
 
-    if (config->enableGrid) {
-        DrawRectangleRec(outlineRect, config->gridColor);
-    }
-
     for (int row = 0; row < gridRow; row++) {
         for (int col = 0; col < gridCol; col++) {
-            int btnX = (gridX + thickness) + (col * (btnSize + thickness));
-            int btnY = (gridY + thickness) + (row * (btnSize + thickness));
+            int btnX = gridX + col * btnSize;
+            int btnY = gridY + row * btnSize;
             Rectangle btnRect = {btnX, btnY, btnSize, btnSize};
 
             bool isFlipped = FontItemGetFlip(item, col, row);
@@ -86,7 +80,11 @@ void canvasDrawArea(
         }
     }
 
-    const int outlineThickness = (configThickness > 0 ? configThickness : 2);
+    const int outlineThickness = 2;
+
+    if (config->enableGrid) {
+        GuiGrid(outlineRect, NULL, btnSize, 2, NULL);
+    }
 
     DrawRectangleLinesEx(outlineRect, outlineThickness, config->gridColor);
 }
@@ -104,6 +102,10 @@ void Canvas(CanvasState *state, const UiConfig *config, FontItem *item) {
                  CANVAS_PANEL_MARGIN * 2;
     Rectangle panelRect = {xpos, ypos, width, height};
 
+    int ogLineColor = GuiGetStyle(DEFAULT, LINE_COLOR);
+
+    GuiSetStyle(DEFAULT, LINE_COLOR, ColorToInt(MAGENTA));
     canvasDrawArea(state, config, item, panelRect);
+    GuiSetStyle(DEFAULT, LINE_COLOR, ogLineColor);
     GuiGroupBox(panelRect, "~canvas");
 }

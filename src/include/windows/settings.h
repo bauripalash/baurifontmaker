@@ -11,7 +11,6 @@ typedef struct {
     bool windowActive;
     Rectangle windowBounds;
     bool enableGrid;
-    int gridThickness;
     char configPath[512];
     int canvasRow;
     int canvasColumn;
