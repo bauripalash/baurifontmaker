@@ -1,4 +1,4 @@
-BIN:=baurifontmaker
+BIN:=bauriglyphmaker
 CMAKE_OUTPUT:=build/$(BIN)/$(BIN)
 ZIG_OUTPUT:=zig-out/bin/$(BIN)
 HEADERS:= $(shell find src/include -path 'src/include/ext' -prune -o -path 'src/include/themes/ibm*' -prune -o -name '*.h' -print)
@@ -46,7 +46,7 @@ massif: cbuild
 .PHONY: perf
 perf:
 	perf record -g -F 999 ./$(CMAKE_OUTPUT)
-	perf script -F +pid > baurifontmaker.perf
+	perf script -F +pid > bauriglyphmaker.perf
 
 .PHONY:valgrind_z
 valgrind_z: zbuild

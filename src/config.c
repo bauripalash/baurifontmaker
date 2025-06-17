@@ -5,7 +5,7 @@
 #include "include/ext/raylib.h"
 #include "include/ext/rini.h"
 
-#define TEMP_FILE             "/home/palash/work/mcu/cc/exp2/baurifontmaker.ini"
+#define TEMP_FILE             "/home/palash/work/mcu/cc/exp2/bauriglyphmaker.ini"
 #define VERSION_KEY           "VERSION"
 #define ENABLE_GRID_KEY       "ENABLE_GRID"
 #define BTN_SIZE_KEY          "BTN_SIZE"
@@ -38,11 +38,11 @@ bool SaveConfigToFile(const UiConfig *config, const char *filepath) {
         confFile = rini_load(fullpath);
     }
 
-    rini_set_comment_line(&confFile, "baurifontmaker config");
+    rini_set_comment_line(&confFile, "bauriglyphmaker config");
     rini_set_comment_line(&confFile, NULL);
 
     rini_set_value_text(
-        &confFile, VERSION_KEY, VERSION, "baurifontmaker version"
+        &confFile, VERSION_KEY, VERSION, "bauriglyphmaker version"
     );
     rini_set_value(
         &confFile, ENABLE_GRID_KEY, config->enableGrid ? GRID_TRUE : GRID_FALSE,

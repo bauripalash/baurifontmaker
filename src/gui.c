@@ -53,7 +53,7 @@ Gui *NewGUI(GuiPrelimError *err) {
 
     ui->winWidth = 800;
     ui->winHeight = 640;
-    ui->title = TextFormat("BauriFontMaker");
+    ui->title = TextFormat("BauriGlyphMaker");
     ui->itemListAnchor = (Vector2){.x = 0, .y = 0};
     ui->currentItem = NULL;
 
@@ -323,8 +323,8 @@ void handleSettingsDialog(Gui *ui) {
 
 void handleOpenFileDialog(Gui *ui) {
     bool ok = OpenFileDialog(
-        "Open Font File", ui->openFilename, "*.bfont;*.baufnt;*.txt",
-        "BauriFontMaker Font Files (*.bfont)"
+        "Open Font File", ui->openFilename, "*.bgmf;*.baufnt;*.txt",
+        "BauriGlyphMaker Font Files (*.bfont)"
     );
 
     if (ok) {

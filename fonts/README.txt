@@ -1,2 +1,2 @@
-'IBM Plex Mono' font is being used as the default font BauriFontMaker.
+'IBM Plex Mono' font is being used as the default font BauriGlyphMaker.
 

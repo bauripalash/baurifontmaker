@@ -1,2 +1,2 @@
-# BauriFontMaker
-*Small font maker for small small applications like embedded systems.*
+# BauriGlyphMaker
+*Small font and icon maker for small small applications like embedded systems.*
