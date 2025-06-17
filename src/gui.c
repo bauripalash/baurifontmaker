@@ -104,8 +104,10 @@ void FreeGui(Gui *ui) {
 }
 
 void UpdateData(Gui *ui) {
-    ui->winHeight = GetScreenHeight();
-    ui->winWidth = GetScreenWidth();
+    int h = GetScreenHeight();
+    int w = GetScreenWidth();
+    ui->winHeight = h;
+    ui->winWidth = w;
 }
 
 void FreeStyles() {
@@ -168,7 +170,6 @@ void setupStates(Gui *ui) {
 
 void handleConfig(Gui *ui) { bool isok = LoadConfigFromFile(ui->conf, NULL); }
 
-
 void GuiMain() {
     SeedRandom();
 
@@ -176,7 +177,7 @@ void GuiMain() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(DEF_WIN_WIDTH, DEF_WIN_HEIGHT, DEF_WIN_TITLE);
     SetWindowMinSize(DEF_WIN_WIDTH, DEF_WIN_HEIGHT);
-	SetAppIcon();
+    SetAppIcon();
     LoadAppFont();
     LoadAppLightTheme();
     GuiPrelimError err;
@@ -420,21 +421,41 @@ bool handleAppError(const Gui *ui) {
     return result;
 }
 
+#define ZOOM_PANEL_WIDTH  200
+#define ZOOM_PANEL_HEIGHT 10
+#define ZOOM_PANEL_MARGIN 20
+
 void StatusBarLayout(Gui *ui) {
     int hoverIndex = ui->states->itemSelector.focus;
     int hoverPosX = ui->states->canvas.hoverPosX;
     int hoverPosY = ui->states->canvas.hoverPosY;
     FontItem *hoveredFontItem = ui->items->items[hoverIndex];
+    Rectangle statusBarRect = (Rectangle){
+        0,
+        ui->winHeight - ui->conf->statusbarHeight,
+        ui->winWidth,
+        ui->conf->statusbarHeight,
+    };
     GuiStatusBar(
+        statusBarRect, TextFormat(
+                           "[%d, %d] | %s (0x%x)", hoverPosX, hoverPosY,
+                           hoveredFontItem->name, hoveredFontItem->value
+                       )
+    );
+
+    GuiSliderBar(
         (Rectangle){
-            0,
-            ui->winHeight - ui->conf->statusbarHeight,
-            ui->winWidth,
-            ui->conf->statusbarHeight,
+            ui->winWidth - ZOOM_PANEL_WIDTH - ZOOM_PANEL_MARGIN,
+            statusBarRect.y +
+                ((ui->conf->statusbarHeight - ZOOM_PANEL_HEIGHT) * 0.5f),
+            ZOOM_PANEL_WIDTH,
+            ZOOM_PANEL_HEIGHT,
+
         },
-        TextFormat(
-            "[%d, %d] | %s (0x%x)", hoverPosX, hoverPosY, hoveredFontItem->name,
-            hoveredFontItem->value
-        )
+        GuiIconText(
+            ICON_LENS,
+            TextFormat("%0.2f%%", ui->states->canvas.zoomValue * 100.0f)
+        ),
+        NULL, &ui->states->canvas.zoomValue, 0.5f, ui->states->canvas.maxZoom
     );
 }

@@ -15,7 +15,7 @@ UiConfig *NewUiConfig() {
     uc->statusbarHeight = DEF_STATUSBAR_HEIGHT;
     uc->itemListWidth = DEF_ITEMLIST_WIDTH;
     uc->gridSize = (Vector2){.x = DEF_CANVAS_COLUMN, .y = DEF_CANVAS_ROW};
-    uc->gridColor = ColorPrimary;
+    uc->gridColor = ColorGrayDarkest;
     uc->canvasCellColor = ColorBackground;
     uc->canvasFillColor = ColorPrimary;
     uc->isPopupActive = false;

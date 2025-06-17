@@ -60,7 +60,6 @@ void SetAppIcon() {
         .format = BGMLOGO_FORMAT,
         .mipmaps = 1
     };
-	
 
     SetWindowIcon(logo);
 }

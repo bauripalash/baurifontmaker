@@ -10,6 +10,9 @@
 typedef struct {
     int hoverPosX;
     int hoverPosY;
+    float zoomValue;
+    float minZoom;
+    float maxZoom;
 
 } CanvasState;
 
