@@ -7,6 +7,7 @@
 #include "include/objects/fontitemlist.h"
 #include "include/objects/uiconfig.h"
 #include "include/objects/uistates.h"
+#include "include/saver.h"
 #include "include/utils.h"
 #include "include/widgets/canvas.h"
 #include "include/widgets/filedialog.h"
@@ -346,6 +347,13 @@ void handleToolbar(Gui *ui) {
     if (ui->states->toolbar.settingsBtnClicked) {
         updateConfigToSettings(ui);
         ui->states->settings.windowActive = true;
+    }
+
+    if (ui->states->toolbar.saveBtnClicked) {
+        bool isok = SaveFontFileAsBfont(ui->items, NULL);
+        if (!isok) {
+            TraceLog(LOG_ERROR, "Failed to save file");
+        }
     }
 
     handleSettingsDialog(ui);
