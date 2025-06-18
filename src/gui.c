@@ -1,6 +1,7 @@
 #include "include/gui.h"
 #include "include/colors.h"
 #include "include/config.h"
+#include "include/converters/bdf.h"
 #include "include/defaults.h"
 #include "include/ext/raylib.h"
 #include "include/objects/glyph.h"
@@ -346,6 +347,8 @@ void handleToolbar(Gui *ui) {
         if (!isok) {
             TraceLog(LOG_ERROR, "Failed to save file");
         }
+
+        isok = ExportToBDF(ui->glyph, NULL);
     }
 
     handleSettingsDialog(ui);
