@@ -13,7 +13,7 @@
 * Lightweight
 
 ### Screenshots
-<img align="center" src="assets/screenshot_1.png" width=800>
+<img align="center" src="assets/screenshot_1.png">
 
 
 ### License
