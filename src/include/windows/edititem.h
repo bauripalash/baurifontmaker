@@ -2,7 +2,7 @@
 #define WIN_EDITITEM_H
 
 #include "../ext/raylib.h"
-#include "../objects/fontitem.h"
+#include "../objects/glyphitem.h"
 
 #include <stdbool.h>
 
@@ -45,6 +45,6 @@ typedef struct {
 } EditItemState;
 
 EditItemState CreateEditItemState(void);
-void SetStateEditItem(EditItemState *state, FontItem *target, int itemLen);
-int EditItemWindow(EditItemState *state, FontItem *targetItem, int itemsLen);
+void SetStateEditItem(EditItemState *state, GlyphItem *target, int itemLen);
+int EditItemWindow(EditItemState *state, GlyphItem *targetItem, int itemsLen);
 #endif

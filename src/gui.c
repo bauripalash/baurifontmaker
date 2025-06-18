@@ -3,8 +3,8 @@
 #include "include/config.h"
 #include "include/defaults.h"
 #include "include/ext/raylib.h"
-#include "include/objects/fontitem.h"
-#include "include/objects/fontitemlist.h"
+#include "include/objects/glyph.h"
+#include "include/objects/glyphitem.h"
 #include "include/objects/uiconfig.h"
 #include "include/objects/uistates.h"
 #include "include/saver.h"
@@ -43,7 +43,7 @@ Gui *NewGUI(GuiPrelimError *err) {
         return NULL;
     }
     ui->states = NULL;
-    ui->items = NULL;
+    ui->glyph = NULL;
     ui->conf = NewUiConfig();
 
     if (ui->conf == NULL) {
@@ -61,25 +61,23 @@ Gui *NewGUI(GuiPrelimError *err) {
     strcpy(ui->openFilename, "");
     strcpy(ui->saveFilename, "");
 
-    ui->items = NewFontItemList();
-    if (ui->items == NULL) {
+    ui->glyph = NewGlyph(NULL);
+
+    if (ui->glyph == NULL) {
         FreeGui(ui);
-        *err = PRELIM_FONTLIST_ALLOC_FAILED;
+        *err = PRELIM_GLYPHOBJ_ALLOC_FAILED;
         return NULL;
     }
 
-    FontItem *tempItem = NewFontItem("0x00000");
+    bool isok = AddNewGlyphItem(ui->glyph, "0x0000", 0x0);
 
-    if (tempItem == NULL) {
+    if (!isok) {
         FreeGui(ui);
-        *err = PRELIM_FONTITEM_ALLOC_FAILED;
+        *err = PRELIM_GLYPHITEM_ALLOC_FAILED;
         return NULL;
     }
 
-    SetFontValue(tempItem, 0);
-    AddToFontItemList(ui->items, tempItem);
-    ui->currentItem = ui->items->items[0];
-
+    ui->currentItem = ui->glyph->glyphs->items[0];
     ui->apperr = APPERR_OK;
 
     *err = PRELIM_OK;
@@ -91,8 +89,8 @@ void FreeGui(Gui *ui) {
     if (ui == NULL) {
         return;
     }
-    if (ui->items != NULL) {
-        FreeFontItemList(ui->items);
+    if (ui->glyph != NULL) {
+        FreeGlyph(ui->glyph);
     }
     if (ui->conf != NULL) {
         FreeUiConfig(ui->conf);
@@ -132,13 +130,13 @@ bool ShowPrelimErrorMsg(GuiPrelimError err) {
         break;
     }
 
-    case PRELIM_FONTLIST_ALLOC_FAILED: {
-        strcpy(errMSg, "Font Item List");
+    case PRELIM_GLYPHOBJ_ALLOC_FAILED: {
+        strcpy(errMSg, "Glyph Object");
         break;
     }
 
-    case PRELIM_FONTITEM_ALLOC_FAILED: {
-        strcpy(errMSg, "Default Font Item");
+    case PRELIM_GLYPHITEM_ALLOC_FAILED: {
+        strcpy(errMSg, "Default Glyph Item");
         break;
     }
 
@@ -264,17 +262,10 @@ void handleNewItemWindow(Gui *ui) {
         CleanNewItemState(&ui->states->newItem);
     }
     if (NewItemWindow(&ui->states->newItem)) {
-
-        FontItem *tempItem = NewFontItem(ui->states->newItem.nameStr);
-        if (!tempItem) {
+        const char *name = ui->states->newItem.nameStr;
+        int value = ui->states->newItem.hexValue;
+        if (!AddNewGlyphItem(ui->glyph, name, value)) {
             ui->apperr = APPERR_NEWITEM_ALLOC;
-            return;
-        }
-        SetFontValue(tempItem, ui->states->newItem.hexValue);
-        bool addOk = AddToFontItemList(ui->items, tempItem);
-
-        if (!addOk) {
-            ui->apperr = APPERR_FONTLIST_ADD;
             return;
         }
     }
@@ -284,12 +275,13 @@ void handleEditItemWindow(Gui *ui) {
     if (ui->states->itemSelector.editBtnClicked) {
         ui->states->editItem.windowActive = true;
         SetStateEditItem(
-            &ui->states->editItem, ui->currentItem, ui->items->len
+            &ui->states->editItem, ui->currentItem, ui->glyph->count
         );
     }
 
-    int result =
-        EditItemWindow(&ui->states->editItem, ui->currentItem, ui->items->len);
+    int result = EditItemWindow(
+        &ui->states->editItem, ui->currentItem, ui->glyph->count
+    );
 
     if (result == EDIT_SAVE_CLICK) {
         TraceLog(ICON_WARNING, "Clicked Save");
@@ -303,7 +295,7 @@ void handleEditItemWindow(Gui *ui) {
 
 void handleItemSelector(Gui *ui) {
 
-    ui->currentItem = ui->items->items[ui->states->itemSelector.active];
+    ui->currentItem = ui->glyph->glyphs->items[ui->states->itemSelector.active];
 }
 
 void updateConfigFromSettings(Gui *ui) {
@@ -350,7 +342,7 @@ void handleToolbar(Gui *ui) {
     }
 
     if (ui->states->toolbar.saveBtnClicked) {
-        bool isok = SaveFontFileAsBfont(ui->items, NULL);
+        bool isok = SaveFontFileAsBfont(ui->glyph, NULL);
         if (!isok) {
             TraceLog(LOG_ERROR, "Failed to save file");
         }
@@ -376,7 +368,7 @@ void Layout(Gui *ui) {
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
     Canvas(&ui->states->canvas, ui->conf, ui->currentItem);
-    ItemSelector(&ui->states->itemSelector, ui->items);
+    ItemSelector(&ui->states->itemSelector, ui->glyph->glyphs);
 
     handleItemSelector(ui);
     StatusBarLayout(ui);
@@ -438,7 +430,7 @@ void StatusBarLayout(Gui *ui) {
     int hoverIndex = ui->states->itemSelector.focus;
     int hoverPosX = ui->states->canvas.hoverPosX;
     int hoverPosY = ui->states->canvas.hoverPosY;
-    FontItem *hoveredFontItem = ui->items->items[hoverIndex];
+    GlyphItem *hoveredFontItem = ui->glyph->glyphs->items[hoverIndex];
     Rectangle statusBarRect = (Rectangle){
         0,
         ui->winHeight - ui->conf->statusbarHeight,

@@ -1,8 +1,8 @@
 #ifndef SAVER_H
 #define SAVER_H
 
-#include "objects/fontitemlist.h"
+#include "objects/glyph.h"
 #include <stdbool.h>
-bool SaveFontFileAsBfont(const FontItemList *list, const char *filename);
+bool SaveFontFileAsBfont(const GlyphObj *g, const char *filename);
 
 #endif

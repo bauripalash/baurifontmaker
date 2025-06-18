@@ -1,4 +1,4 @@
-#include "../include/objects/fontitem.h"
+#include "../include/objects/glyphitem.h"
 #include "../include/ext/raylib.h"
 
 #include "../include/balloc.h"
@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <string.h>
 
-FontItem *NewFontItem(const char *name) {
-    FontItem *fi = (FontItem *)bcalloc(1, sizeof(FontItem));
+GlyphItem *NewGlyphItem(const char *name) {
+    GlyphItem *fi = (GlyphItem *)bcalloc(1, sizeof(GlyphItem));
     if (fi == NULL) {
         TraceLog(LOG_ERROR, "Failed to allocate memory for new Font Item");
         return NULL;
@@ -29,7 +29,7 @@ FontItem *NewFontItem(const char *name) {
 
     return fi;
 }
-void FreeFontItem(FontItem *fi) {
+void FreeGlyphItem(GlyphItem *fi) {
     if (fi == NULL) {
         return;
     }
@@ -38,22 +38,35 @@ void FreeFontItem(FontItem *fi) {
     }
     bfree(fi);
 }
-void SetFontValue(FontItem *fi, int value) { fi->value = value; }
+void SetGlyphValue(GlyphItem *fi, int value) { fi->value = value; }
+void SetGlyphItemName(GlyphItem *gi, const char *name) {
+    if (gi == NULL) {
+        return;
+    }
 
-bool FontItemFlipBit(FontItem *fi, uint8_t col, uint8_t row) {
+    if (gi->name == NULL) {
+        return;
+    }
+
+    if (name == NULL) {
+        return;
+    }
+}
+
+bool GlyphItemFlipBit(GlyphItem *fi, uint8_t col, uint8_t row) {
     uint8_t val = fi->bits[row];
     fi->bits[row] = val ^ (1 << (7 - col));
 
-    return FontItemGetFlip(fi, col, row);
+    return GlyphItemGetFlip(fi, col, row);
 }
-bool FontItemGetFlip(const FontItem *fi, uint8_t col, uint8_t row) {
+bool GlyphItemGetFlip(const GlyphItem *fi, uint8_t col, uint8_t row) {
     uint8_t bts = fi->bits[row];
     uint8_t val = (bts >> (7 - col)) & 1;
 
     return val == 1;
 }
 
-uint8_t *GetFlippedIndexes(const FontItem *fi, int *length) {
+uint8_t *GetFlippedIndexes(const GlyphItem *fi, int *length) {
     uint8_t *result = (uint8_t *)bcalloc(64, sizeof(uint8_t));
 
     *length = 0;
@@ -65,7 +78,7 @@ uint8_t *GetFlippedIndexes(const FontItem *fi, int *length) {
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
 
-            if (FontItemGetFlip(fi, col, row)) {
+            if (GlyphItemGetFlip(fi, col, row)) {
                 result[*length] = row * 8 + col;
                 (*length)++;
             }
@@ -75,7 +88,7 @@ uint8_t *GetFlippedIndexes(const FontItem *fi, int *length) {
     return result;
 }
 
-void LogFontItem(const FontItem *fi) {
+void LogGlyphItem(const GlyphItem *fi) {
     printf("[ ");
     for (int i = 0; i < 8; i++) {
         printf("0x%X, ", fi->bits[i]);
@@ -83,7 +96,7 @@ void LogFontItem(const FontItem *fi) {
     printf(" ]\n");
 }
 
-void LogBinaryFontItem(const FontItem *fi) {
+void LogBinaryGlyphItem(const GlyphItem *fi) {
     printf("[\n");
     for (int i = 0; i < 8; i++) {
 

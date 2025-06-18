@@ -55,7 +55,7 @@ void itemCtrlBtns(ItemSelectorState *state, float x, float y) {
     );
 }
 
-void ItemSelector(ItemSelectorState *state, FontItemList *list) {
+void ItemSelector(ItemSelectorState *state, GlyphItemList *list) {
 
     Rectangle itemPanelBounds =
         (Rectangle){ITEM_PANEL_MARGIN, state->topSkip, state->width,
@@ -86,7 +86,7 @@ void ItemSelector(ItemSelectorState *state, FontItemList *list) {
 
     int rawFocus = state->focus;
     if (rawFocus != -1 && rawFocus != state->active) {
-        FontItem *currentItem = list->items[rawFocus];
+        GlyphItem *currentItem = list->items[rawFocus];
         Vector2 mousePos = GetMousePosition();
         Rectangle hoverRect = {
             mousePos.x + 10, mousePos.y + 10, CELL_SIZE * 10, CELL_SIZE * 10
@@ -99,8 +99,9 @@ void ItemSelector(ItemSelectorState *state, FontItemList *list) {
         int posy = hoverRect.y + CELL_SIZE;
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                Color clr = FontItemGetFlip(currentItem, col, row) ? ToolTipFill
-                                                                   : ToolTipBg;
+                Color clr = GlyphItemGetFlip(currentItem, col, row)
+                                ? ToolTipFill
+                                : ToolTipBg;
 
                 DrawRectangleRec(
                     (Rectangle){posx, posy, CELL_SIZE, CELL_SIZE}, clr

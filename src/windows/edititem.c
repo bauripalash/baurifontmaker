@@ -32,13 +32,13 @@ EditItemState CreateEditItemState() {
     return state;
 }
 
-void SetStateEditItem(EditItemState *state, FontItem *target, int itemLen) {
+void SetStateEditItem(EditItemState *state, GlyphItem *target, int itemLen) {
     strcpy(state->hexStr, TextFormat("0x%x", target->value));
     strcpy(state->nameStr, target->name);
     state->indexValue = target->listIndex;
 }
 
-int EditItemWindow(EditItemState *state, FontItem *target, int itemLen) {
+int EditItemWindow(EditItemState *state, GlyphItem *target, int itemLen) {
     state->windowBounds.x = (GetScreenWidth() - EDIT_W_WIDTH) * 0.5f;
     state->windowBounds.y = (GetScreenHeight() - EDIT_W_HEIGHT) * 0.5f;
     int winPosX = state->windowBounds.x;

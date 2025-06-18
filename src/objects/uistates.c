@@ -1,4 +1,5 @@
 #include "../include/objects/uistates.h"
+#include "../include/widgets/canvas.h"
 #include "../include/balloc.h"
 #include "../include/defaults.h"
 
@@ -17,12 +18,8 @@ UiStates *NewUiStates() {
     );
 
     states->settings = CreateSettingsState();
-    states->canvas = CreateCanvas(
-        (Rectangle){DEF_ITEMLIST_WIDTH + ITEM_PANEL_MARGIN, DEF_TOOLBAR_HEIGHT,
-                    0, DEF_STATUSBAR_HEIGHT},
-        (Vector2){.x = DEF_CANVAS_COLUMN, .y = DEF_CANVAS_ROW}, DEF_ENABLE_GRID,
-        DEF_GRID_THICKNESS
-    );
+    states->canvas = CreateCanvas();
+
 
     return states;
 }

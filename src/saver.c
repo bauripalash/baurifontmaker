@@ -1,12 +1,13 @@
 #include "include/saver.h"
 #include "include/ext/raylib.h"
+#include "include/objects/glyph.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
 #define TEMP_FILE "/home/palash/work/mcu/cc/exp2/tempfont.bfont"
 
-bool SaveFontFileAsBfont(const FontItemList *list, const char *filename) {
+bool SaveFontFileAsBfont(const GlyphObj *glyph, const char *filename) {
     bool result = true;
     const char *fullpath;
     if (filename != NULL) {
@@ -52,10 +53,13 @@ bool SaveFontFileAsBfont(const FontItemList *list, const char *filename) {
     );
     fprintf(fptr, "# <== Structure End \n");
 
-    for (int i = 0; i < list->len; i++) {
-        fprintf(fptr, "%d\n%s\n", list->items[i]->value, list->names[i]);
+    for (int i = 0; i < glyph->glyphs->len; i++) {
+        fprintf(
+            fptr, "%d\n%s\n", glyph->glyphs->items[i]->value,
+            glyph->glyphs->names[i]
+        );
         for (int j = 0; j < 8; j++) {
-            fprintf(fptr, "%d", list->items[i]->bits[j]);
+            fprintf(fptr, "%d", glyph->glyphs->items[i]->bits[j]);
         }
         fprintf(fptr, "\n");
     }

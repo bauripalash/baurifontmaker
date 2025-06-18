@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 #include "ext/raylib.h"
-#include "objects/fontitem.h"
-#include "objects/fontitemlist.h"
+#include "objects/glyph.h"
+#include "objects/glyphitem.h"
 #include "objects/uiconfig.h"
 #include "objects/uistates.h"
 
@@ -14,8 +14,8 @@ typedef enum {
     PRELIM_OK = 0,
     PRELIM_GUI_ALLOC_FAILED,
     PRELIM_CONFIG_ALLOC_FAILED,
-    PRELIM_FONTLIST_ALLOC_FAILED,
-    PRELIM_FONTITEM_ALLOC_FAILED,
+    PRELIM_GLYPHOBJ_ALLOC_FAILED,
+    PRELIM_GLYPHITEM_ALLOC_FAILED,
     PRELIM_STATES_ALLOC_FAILED,
 } GuiPrelimError;
 
@@ -36,8 +36,8 @@ typedef struct Gui {
     char saveFilename[512];
 
     Vector2 itemListAnchor;
-    FontItemList *items;
-    FontItem *currentItem;
+    GlyphObj *glyph;
+    GlyphItem *currentItem;
     AppError apperr;
 
 } Gui;

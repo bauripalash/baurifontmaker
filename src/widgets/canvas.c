@@ -1,6 +1,6 @@
 #include "../include/widgets/canvas.h"
 #include "../include/ext/raygui.h"
-#include "../include/objects/fontitem.h"
+#include "../include/objects/glyphitem.h"
 #include "../include/widgets/itemselector.h"
 #include <math.h>
 #include <stdbool.h>
@@ -40,7 +40,7 @@ static bool isButtonClicked(Rectangle rect) {
 }
 
 Rectangle canvasDrawArea(
-    CanvasState *state, const UiConfig *config, FontItem *item, Rectangle panel
+    CanvasState *state, const UiConfig *config, GlyphItem *item, Rectangle panel
 ) {
     float btnSize = config->gridBtnSize * state->zoomValue;
 
@@ -69,9 +69,9 @@ Rectangle canvasDrawArea(
             int btnY = gridY + row * btnSize;
             Rectangle btnRect = {btnX, btnY, btnSize, btnSize};
 
-            bool isFlipped = FontItemGetFlip(item, col, row);
+            bool isFlipped = GlyphItemGetFlip(item, col, row);
             if (isButtonClicked(btnRect)) {
-                isFlipped = FontItemFlipBit(item, col, row);
+                isFlipped = GlyphItemFlipBit(item, col, row);
             }
 
             if (isButtonHovered(btnRect)) {
@@ -99,7 +99,7 @@ Rectangle canvasDrawArea(
 
 #define PANEL_MARGIN_BOTTOM 5
 
-void Canvas(CanvasState *state, const UiConfig *config, FontItem *item) {
+void Canvas(CanvasState *state, const UiConfig *config, GlyphItem *item) {
 
     int winWidth = GetScreenWidth();
     int winHeight = GetScreenHeight();
