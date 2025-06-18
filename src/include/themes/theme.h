@@ -8,8 +8,7 @@
 #include "../exported/ibmplexmonofont.h"
 // clang-format on
 
-#define LIGHT_PROP_COUNT 32
-static const GuiStyleProp LightThemeProps[LIGHT_PROP_COUNT] = {
+static const GuiStyleProp LightThemeProps[] = {
     {DEFAULT, TEXT_LINE_SPACING, (int)24},
     {DEFAULT, BACKGROUND_COLOR, HexColorBackground},
 
@@ -48,7 +47,26 @@ static const GuiStyleProp LightThemeProps[LIGHT_PROP_COUNT] = {
     {TEXTBOX, TEXT_COLOR_FOCUSED, HexColorPrimary},
     {TEXTBOX, BORDER_COLOR_PRESSED, HexColorGrayLighter},
     {TEXTBOX, BORDER_COLOR_FOCUSED, HexColorGrayDarkest},
+
+    {SLIDER, BORDER_COLOR_NORMAL, HexColorGrayLighter},
+    {SLIDER, BORDER_COLOR_FOCUSED, HexColorGrayDarkest},
+    {SLIDER, BORDER_COLOR_PRESSED, HexColorGrayDarkest},
+
+    {SLIDER, BASE_COLOR_NORMAL, HexColorBackground},  // Slider background
+    {SLIDER, BASE_COLOR_FOCUSED, HexColorBackground}, // What is this used for??
+    {SLIDER, BASE_COLOR_PRESSED, HexColorGrayDarkest}, // Slider normal color
+
+    {SLIDER, TEXT_COLOR_NORMAL, HexColorPrimary}, // What is this used for??
+    {SLIDER, TEXT_COLOR_FOCUSED,
+     HexColorPrimary}, // Slider color on hover/focus
+
+    {SLIDER, TEXT_COLOR_PRESSED, HexColorPrimary}, // Slider color when pressed
+    {LABEL, TEXT_COLOR_PRESSED, HexColorPrimary},
+    {LABEL, TEXT_COLOR_FOCUSED, HexColorPrimary},
+
 };
+
+#define ARRAY_COUNT(a) (sizeof(a) / sizeof((a)[0]))
 
 void LoadAppFont() { GuiLoadStyleIBMPlexMonoFont(); }
 
@@ -68,7 +86,7 @@ void SetAppIcon() {
 void LoadAppDarkTheme();
 
 void LoadAppLightTheme() {
-    for (int i = 0; i < LIGHT_PROP_COUNT; i++) {
+    for (int i = 0; i < ARRAY_COUNT(LightThemeProps); i++) {
         GuiSetStyle(
             LightThemeProps[i].controlId, LightThemeProps[i].propertyId,
             LightThemeProps[i].propertyValue
