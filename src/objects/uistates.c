@@ -1,7 +1,7 @@
 #include "../include/objects/uistates.h"
-#include "../include/widgets/canvas.h"
 #include "../include/balloc.h"
 #include "../include/defaults.h"
+#include "../include/widgets/canvas.h"
 
 UiStates *NewUiStates() {
 
@@ -19,7 +19,6 @@ UiStates *NewUiStates() {
 
     states->settings = CreateSettingsState();
     states->canvas = CreateCanvas();
-
 
     return states;
 }
