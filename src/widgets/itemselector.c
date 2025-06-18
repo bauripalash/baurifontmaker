@@ -1,4 +1,5 @@
 #include "../include/widgets/itemselector.h"
+#include "../include/colors.h"
 #include "../include/ext/raygui.h"
 #include "../include/ext/raylib.h"
 #include <stdbool.h>
@@ -23,10 +24,15 @@ ItemSelectorState CreateItemSelector(int width, int topSkip, int bottomSkip) {
     };
 }
 
+#define MARGIN_BTN    5
+#define CELL_SIZE     6
+#define ToolTipBg     (Fade(ColorGrayDarkest, 0.8))
+#define ToolTipBorder (Fade(ColorGrayDarkest, 0.9))
+#define ToolTipFill   (Fade(ColorPrimary, 1))
+
 void itemCtrlBtns(ItemSelectorState *state, float x, float y) {
     int maxWidth = state->width - ITEM_PANEL_PADDING * 2;
-    float widthForNewBtn = maxWidth * (2.0 / 3.0) - 5;
-    // TODO: MARGIN -> 5;
+    float widthForNewBtn = maxWidth * (2.0 / 3.0) - MARGIN_BTN;
 
     state->newBtnClicked = GuiButton(
         (Rectangle){
@@ -49,7 +55,7 @@ void itemCtrlBtns(ItemSelectorState *state, float x, float y) {
     );
 }
 
-void ItemSelector(ItemSelectorState *state, const char **names, int len) {
+void ItemSelector(ItemSelectorState *state, FontItemList *list) {
 
     Rectangle itemPanelBounds =
         (Rectangle){ITEM_PANEL_MARGIN, state->topSkip, state->width,
@@ -65,17 +71,46 @@ void ItemSelector(ItemSelectorState *state, const char **names, int len) {
                 (ITEM_PANEL_PADDING * 2);
 
     state->lastActive = state->active;
-    GuiListViewEx(
+    int result = GuiListViewEx(
         (Rectangle){itemPanelBounds.x + ITEM_PANEL_PADDING, listY,
                     state->width - (ITEM_PANEL_PADDING * 2),
                     itemPanelBounds.height - ITEM_PANEL_CTRL_BTN_HEIGHT -
                         (ITEM_PANEL_PADDING * 3)},
-        names, len, &state->index, &state->active, &state->focus
+        list->names, list->len, &state->index, &state->active, &state->focus
 
     );
 
     if (state->active < 0) {
         state->active = state->lastActive;
+    }
+
+    int rawFocus = state->focus;
+    if (rawFocus != -1 && rawFocus != state->active) {
+        FontItem *currentItem = list->items[rawFocus];
+        Vector2 mousePos = GetMousePosition();
+        Rectangle hoverRect = {
+            mousePos.x + 10, mousePos.y + 10, CELL_SIZE * 10, CELL_SIZE * 10
+        };
+
+        DrawRectangleRec(hoverRect, ToolTipBg);
+        DrawRectangleLinesEx(hoverRect, 2, ToolTipBorder);
+
+        int posx = hoverRect.x + CELL_SIZE;
+        int posy = hoverRect.y + CELL_SIZE;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Color clr = FontItemGetFlip(currentItem, col, row) ? ToolTipFill
+                                                                   : ToolTipBg;
+
+                DrawRectangleRec(
+                    (Rectangle){posx, posy, CELL_SIZE, CELL_SIZE}, clr
+                );
+
+                posx += CELL_SIZE;
+            }
+            posy += CELL_SIZE;
+            posx = hoverRect.x + CELL_SIZE;
+        }
     }
 
     if (state->focus < 0) {

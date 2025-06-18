@@ -368,7 +368,8 @@ void Layout(Gui *ui) {
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
     Canvas(&ui->states->canvas, ui->conf, ui->currentItem);
-    ItemSelector(&ui->states->itemSelector, ui->items->names, ui->items->len);
+    ItemSelector(&ui->states->itemSelector, ui->items);
+
     handleItemSelector(ui);
     StatusBarLayout(ui);
 

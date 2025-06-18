@@ -1,5 +1,6 @@
 #ifndef ITEM_SELECTOR_H
 #define ITEM_SELECTOR_H
+#include "../objects/fontitemlist.h"
 #include <stdbool.h>
 
 #define ITEM_PANEL_PADDING          10
@@ -26,6 +27,6 @@ typedef struct {
 } ItemSelectorState;
 
 ItemSelectorState CreateItemSelector(int width, int topSkip, int bottomSkip);
-void ItemSelector(ItemSelectorState *state, const char **names, int len);
+void ItemSelector(ItemSelectorState *state, FontItemList *list);
 
 #endif
