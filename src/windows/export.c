@@ -7,12 +7,21 @@
 #include <stdlib.h>
 
 ExportState CreateExportState() {
-    return (ExportState){.windowActive = false,
-                         .windowBounds =
-                             (Rectangle){0, 0, EXPORT_W_WIDTH, EXPORT_W_HEIGHT},
-                         .buffer = NULL};
+    ExportState state = {0};
+    state.windowActive = false;
+    state.windowBounds = (Rectangle){0, 0, EXPORT_W_WIDTH, EXPORT_W_HEIGHT};
+    state.buffer = NULL;
+    state.codeBtnClicked = false;
+
+    return state;
 }
 
+void ClearExportBuffer(ExportState *state) {
+    if (state->buffer != NULL) {
+        bfree(state->buffer);
+        state->buffer = NULL;
+    }
+}
 #define BTN_W 80
 #define BTN_H 30
 
@@ -37,7 +46,8 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
 
         int x = winposX + EXPORT_W_MARGIN;
         int y = winposY + EXPORT_W_MARGIN;
-        bool xcode = GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Code");
+        state->codeBtnClicked =
+            GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Code");
 
         x += EXPORT_W_MARGIN + BTN_W;
 
@@ -52,10 +62,6 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
             winH - BTN_H - EXPORT_W_MARGIN * 3,
 
         };
-
-        if (xcode) {
-            state->buffer = GenerateCHeader(obj);
-        }
 
         if (state->buffer == NULL) {
             GuiDisable();

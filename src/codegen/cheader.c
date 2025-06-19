@@ -15,7 +15,21 @@ static const char *template = "\
 ${CODE}\n\
 ";
 
+char *getCode(const GlyphObj *obj);
+
 char *GenerateCHeader(const GlyphObj *glyph) {
-    TraceLog(LOG_WARNING, "CODE %s", template);
-    return TextReplace(template, "${NAME}", glyph->name);
+    char *name = TextReplace(template, "${NAME}", glyph->name);
+    char *author = TextReplace(name, "${AUTHOR}", glyph->author);
+    MemFree(name);
+    char *license = TextReplace(author, "${LICENSE}", glyph->license);
+    MemFree(author);
+    char *desc = TextReplace(license, "${DESCRIPTION}", glyph->description);
+    MemFree(license);
+    char *src = getCode(glyph);
+    char *code = TextReplace(desc, "${CODE}", src);
+    // Free src -> bfree(src)
+    MemFree(desc);
+    return code;
 }
+
+char *getCode(const GlyphObj *obj) { return "<TODO>"; }

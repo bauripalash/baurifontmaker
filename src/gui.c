@@ -1,4 +1,5 @@
 #include "include/gui.h"
+#include "include/codegen.h"
 #include "include/colors.h"
 #include "include/config.h"
 #include "include/converter.h"
@@ -312,8 +313,21 @@ void handleInfoEditWindow(Gui *ui) {
 }
 
 void handleExportWindow(Gui *ui) {
+
+    if (ui->states->toolbar.exportBtnClicked) {
+        ui->states->export.windowActive = true;
+        ui->states->toolbar.exportBtnClicked = false;
+    }
     if (ui->states->export.windowActive) {
         bool result = ExportWindow(&ui->states->export, ui->glyph);
+
+        if (ui->states->export.codeBtnClicked) {
+            ClearExportBuffer(&ui->states->export);
+            ui->states->export.buffer = GenerateCHeader(ui->glyph);
+            ui->states->export.codeBtnClicked = false;
+        }
+    } else {
+        ClearExportBuffer(&ui->states->export);
     }
 }
 
@@ -337,11 +351,13 @@ void updateConfigToSettings(Gui *ui) {
 void handleToolbar(Gui *ui) {
     if (ui->states->toolbar.openBtnClicked) {
         handleOpenFileDialog(ui);
+        ui->states->toolbar.openBtnClicked = false;
     }
 
     if (ui->states->toolbar.settingsBtnClicked) {
         updateConfigToSettings(ui);
         ui->states->settings.windowActive = true;
+        ui->states->toolbar.settingsBtnClicked = false;
     }
 
     if (ui->states->toolbar.saveBtnClicked) {
@@ -351,15 +367,13 @@ void handleToolbar(Gui *ui) {
         }
 
         isok = ExportToBDF(ui->glyph, NULL);
+        ui->states->toolbar.saveBtnClicked = false;
     }
 
     if (ui->states->toolbar.glyphOptBtnClicked) {
         UpdateInfo(&ui->states->infoEdit, ui->glyph);
         ui->states->infoEdit.windowActive = true;
-    }
-
-    if (ui->states->toolbar.exportBtnClicked) {
-        ui->states->export.windowActive = true;
+        ui->states->toolbar.glyphOptBtnClicked = false;
     }
 
     handleSettingsDialog(ui);

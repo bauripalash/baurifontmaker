@@ -12,10 +12,12 @@ typedef struct {
     bool windowActive;
     Rectangle windowBounds;
     char *buffer;
+    bool codeBtnClicked;
 
 } ExportState;
 
 ExportState CreateExportState();
 bool ExportWindow(ExportState *state, GlyphObj *obj);
+void ClearExportBuffer(ExportState *state);
 
 #endif

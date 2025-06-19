@@ -38,6 +38,8 @@ bool SaveConfigToFile(const UiConfig *config, const char *filepath) {
         confFile = rini_load(fullpath);
     }
 
+    // NOTE: `rini_load` is leaking memory <FIX>
+
     rini_set_comment_line(&confFile, "bauriglyphmaker config");
     rini_set_comment_line(&confFile, NULL);
 
