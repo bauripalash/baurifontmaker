@@ -24,6 +24,7 @@ ToolbarState CreateToolbar(int height) {
         .settingsBtnClicked = false,
         .helpBtnClicked = false,
         .glyphOptBtnClicked = false,
+        .exportBtnClicked = false,
     };
 }
 
@@ -69,6 +70,10 @@ void Toolbar(ToolbarState *state) {
 
     state->glyphOptBtnClicked =
         GuiButton(btnBound, GuiIconText(ICON_FILETYPE_INFO, NULL));
+
+    btnBound.x += leftIncrement;
+    state->exportBtnClicked =
+        GuiButton(btnBound, GuiIconText(ICON_FILE_EXPORT, NULL));
 
     btnBound.x = state->bounds.width - TOOL_MARGIN - btnBound.width;
 

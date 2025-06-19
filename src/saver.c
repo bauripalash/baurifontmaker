@@ -52,6 +52,10 @@ bool SaveFontFileAsBfont(const GlyphObj *glyph, const char *filename) {
               "VALUES>\t\t# Each Row is 2 digits\n"
     );
     fprintf(fptr, "# <== Structure End \n");
+    fprintf(fptr, "NAME: %s\n", glyph->name);
+    fprintf(fptr, "AUTHOR: %s\n", glyph->author);
+    fprintf(fptr, "LICENSE: %s\n", glyph->license);
+    fprintf(fptr, "DESCRIPTION: %s\n", glyph->description);
 
     for (int i = 0; i < glyph->glyphs->len; i++) {
         fprintf(

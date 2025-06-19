@@ -17,6 +17,7 @@ typedef struct {
     bool settingsBtnClicked;
     bool helpBtnClicked;
     bool glyphOptBtnClicked;
+    bool exportBtnClicked;
 } ToolbarState;
 
 ToolbarState CreateToolbar(int height);

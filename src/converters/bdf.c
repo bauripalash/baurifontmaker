@@ -1,4 +1,4 @@
-#include "../include/converters/bdf.h"
+#include "../include/converter.h"
 #include "../include/ext/raylib.h"
 #include <stdio.h>
 

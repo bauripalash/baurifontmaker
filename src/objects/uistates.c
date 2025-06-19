@@ -20,6 +20,7 @@ UiStates *NewUiStates() {
     states->settings = CreateSettingsState();
     states->canvas = CreateCanvas();
     states->infoEdit = CreateInfoEditState();
+    states->export = CreateExportState();
 
     return states;
 }
@@ -27,7 +28,8 @@ UiStates *NewUiStates() {
 bool WindowPopupActive(UiStates *states) {
     return (
         states->newItem.windowActive || states->editItem.windowActive ||
-        states->settings.windowActive || states->infoEdit.windowActive
+        states->settings.windowActive || states->infoEdit.windowActive ||
+        states->export.windowActive
     );
 }
 

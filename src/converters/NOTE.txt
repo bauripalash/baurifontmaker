@@ -1,0 +1,5 @@
+Converting BauriGlyphMaker Files to Font files
+
+* BDF	[In-Progress]	[Proof of Concept]
+* TTF 	[TODO] 			[TODO]
+* OTF	[TODO]			[TODO]

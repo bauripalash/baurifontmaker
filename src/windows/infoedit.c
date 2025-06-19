@@ -5,6 +5,7 @@
 #include <string.h>
 
 #define LABEL_WIDTH  200
+#define INPUT_WIDTH  300
 #define LABEL_HEIGHT 32
 #define PADDING      10
 
@@ -43,6 +44,25 @@ void UpdateInfo(InfoEditState *state, const GlyphObj *obj) {
     }
 }
 
+// should we let gui handle this process?
+void updateGlyphInfo(InfoEditState *state, GlyphObj *obj) {
+    if (!TextIsEqual(state->name, obj->name)) {
+        TextCopy(obj->name, state->name);
+    }
+
+    if (!TextIsEqual(state->author, obj->author)) {
+        TextCopy(obj->author, state->author);
+    }
+
+    if (!TextIsEqual(state->license, obj->license)) {
+        TextCopy(obj->license, state->license);
+    }
+
+    if (!TextIsEqual(state->description, obj->description)) {
+        TextCopy(obj->description, state->description);
+    }
+}
+
 bool InfoEditWindow(InfoEditState *state, GlyphObj *obj) {
     int winposX = (GetScreenWidth() - INFO_W_WIDTH) * 0.5f;
     int winposY = (GetScreenHeight() - INFO_W_HEIGHT) * 0.5f;
@@ -63,10 +83,10 @@ bool InfoEditWindow(InfoEditState *state, GlyphObj *obj) {
 
         int x = winposX + INFO_W_MARGIN;
         int y = winposY + INFO_W_MARGIN;
-        int inpX = winposX + winW - INFO_W_MARGIN - LABEL_WIDTH;
+        int inpX = winposX + winW - INFO_W_MARGIN - INPUT_WIDTH;
         Rectangle btnRect = {x, y, LABEL_WIDTH, LABEL_HEIGHT};
 
-        Rectangle inpRect = {inpX, y, LABEL_WIDTH, LABEL_HEIGHT};
+        Rectangle inpRect = {inpX, y, INPUT_WIDTH, LABEL_HEIGHT};
 
         GuiLabel(btnRect, "Name");
 
@@ -105,8 +125,6 @@ bool InfoEditWindow(InfoEditState *state, GlyphObj *obj) {
 
         GuiLabel(btnRect, "Description");
 
-        inpRect.height *= 2.5f;
-
         if (GuiTextBox(
                 inpRect, state->description, MAX_GLYPH_DESC_LEN,
                 state->descEditMode
@@ -115,11 +133,22 @@ bool InfoEditWindow(InfoEditState *state, GlyphObj *obj) {
         }
 
         btnRect.width = 80;
-        btnRect.y += PADDING * 2 + (LABEL_HEIGHT * 2.5f);
+        btnRect.y += INFO_W_MARGIN * 2 + LABEL_HEIGHT;
 
-        GuiButton(btnRect, "Save");
+        bool saveClicked = GuiButton(btnRect, "Save");
         btnRect.x += PADDING + btnRect.width;
-        GuiButton(btnRect, "Cancel");
+        bool cancelClicked = GuiButton(btnRect, "Cancel");
+
+        if (saveClicked) {
+            updateGlyphInfo(state, obj);
+            state->windowActive = false;
+            return true;
+        }
+
+        if (cancelClicked) {
+            state->windowActive = false;
+            return false;
+        }
     }
 
     return false;

@@ -1,7 +1,7 @@
 #include "include/gui.h"
 #include "include/colors.h"
 #include "include/config.h"
-#include "include/converters/bdf.h"
+#include "include/converter.h"
 #include "include/defaults.h"
 #include "include/ext/raylib.h"
 #include "include/objects/glyph.h"
@@ -15,6 +15,7 @@
 #include "include/widgets/itemselector.h"
 #include "include/widgets/toolbar.h"
 #include "include/windows/edititem.h"
+#include "include/windows/export.h"
 #include "include/windows/infoedit.h"
 #include "include/windows/newitem.h"
 #include "include/windows/settings.h"
@@ -246,18 +247,6 @@ bool DrawWindow(Gui *ui, GuiPrelimError *err) {
     return true;
 }
 
-void FillScrenForPopup(const Gui *ui) {
-    DrawRectangleRec(
-        (Rectangle){
-            0,
-            0,
-            ui->winWidth,
-            ui->winHeight,
-        },
-        ColorTrBlack
-    );
-}
-
 void handleNewItemWindow(Gui *ui) {
     if (ui->states->itemSelector.newBtnClicked) {
         ui->states->newItem.windowActive = true;
@@ -322,6 +311,12 @@ void handleInfoEditWindow(Gui *ui) {
     }
 }
 
+void handleExportWindow(Gui *ui) {
+    if (ui->states->export.windowActive) {
+        bool result = ExportWindow(&ui->states->export, ui->glyph);
+    }
+}
+
 void handleOpenFileDialog(Gui *ui) {
     bool ok = OpenFileDialog(
         "Open Font File", ui->openFilename, "*.bgmf;*.baufnt;*.txt",
@@ -363,19 +358,35 @@ void handleToolbar(Gui *ui) {
         ui->states->infoEdit.windowActive = true;
     }
 
+    if (ui->states->toolbar.exportBtnClicked) {
+        ui->states->export.windowActive = true;
+    }
+
     handleSettingsDialog(ui);
     handleInfoEditWindow(ui);
+    handleExportWindow(ui);
+}
+
+void FillScreenForPopup(const Gui *ui) {
+    DrawRectangleRec(
+        (Rectangle){
+            0,
+            0,
+            GetScreenWidth(),
+            GetScreenHeight(),
+        },
+        Fade(ColorGrayDarkest, 0.5f)
+    );
 }
 
 void Layout(Gui *ui) {
     GuiEnableTooltip();
+    bool popup = WindowPopupActive(ui->states);
 
-    ui->conf->isPopupActive = WindowPopupActive(ui->states);
+    ui->conf->isPopupActive = popup;
 
-    if (ui->conf->isPopupActive || hasAppError(ui)) {
-
+    if (popup || hasAppError(ui)) {
         GuiLock();
-        FillScrenForPopup(ui);
     }
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
@@ -387,6 +398,11 @@ void Layout(Gui *ui) {
     StatusBarLayout(ui);
 
     GuiUnlock();
+
+    if (popup || hasAppError(ui)) {
+
+        FillScreenForPopup(ui);
+    }
 
     handleNewItemWindow(ui);
     handleEditItemWindow(ui);

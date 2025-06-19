@@ -5,6 +5,7 @@
 #include "../widgets/itemselector.h"
 #include "../widgets/toolbar.h"
 #include "../windows/edititem.h"
+#include "../windows/export.h"
 #include "../windows/infoedit.h"
 #include "../windows/newitem.h"
 #include "../windows/settings.h"
@@ -18,6 +19,7 @@ typedef struct {
     SettingsState settings;
     CanvasState canvas;
     InfoEditState infoEdit;
+    ExportState export;
 } UiStates;
 
 UiStates *NewUiStates();

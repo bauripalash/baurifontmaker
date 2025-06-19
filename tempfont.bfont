@@ -4,6 +4,10 @@
 # <FONT ITEM NAME>
 # <FONT ITEM BIT VALUES>		# Each Row is 2 digits
 # <== Structure End 
+NAME: Untitled
+AUTHOR: <AUTHOR>
+LICENSE: <LICENSE>
+DESCRIPTION: New Glyph Object
 0
 0x0000
-204204252204204000
+1280000000
