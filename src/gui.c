@@ -15,6 +15,7 @@
 #include "include/widgets/itemselector.h"
 #include "include/widgets/toolbar.h"
 #include "include/windows/edititem.h"
+#include "include/windows/infoedit.h"
 #include "include/windows/newitem.h"
 #include "include/windows/settings.h"
 
@@ -315,6 +316,12 @@ void handleSettingsDialog(Gui *ui) {
     }
 }
 
+void handleInfoEditWindow(Gui *ui) {
+    if (ui->states->infoEdit.windowActive) {
+        bool result = InfoEditWindow(&ui->states->infoEdit, ui->glyph);
+    }
+}
+
 void handleOpenFileDialog(Gui *ui) {
     bool ok = OpenFileDialog(
         "Open Font File", ui->openFilename, "*.bgmf;*.baufnt;*.txt",
@@ -351,16 +358,19 @@ void handleToolbar(Gui *ui) {
         isok = ExportToBDF(ui->glyph, NULL);
     }
 
+    if (ui->states->toolbar.glyphOptBtnClicked) {
+        UpdateInfo(&ui->states->infoEdit, ui->glyph);
+        ui->states->infoEdit.windowActive = true;
+    }
+
     handleSettingsDialog(ui);
+    handleInfoEditWindow(ui);
 }
 
 void Layout(Gui *ui) {
     GuiEnableTooltip();
 
-    ui->conf->isPopupActive =
-        (ui->states->newItem.windowActive ||
-         ui->states->editItem.windowActive ||
-         ui->states->settings.windowActive);
+    ui->conf->isPopupActive = WindowPopupActive(ui->states);
 
     if (ui->conf->isPopupActive || hasAppError(ui)) {
 

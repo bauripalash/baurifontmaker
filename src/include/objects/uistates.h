@@ -5,8 +5,10 @@
 #include "../widgets/itemselector.h"
 #include "../widgets/toolbar.h"
 #include "../windows/edititem.h"
+#include "../windows/infoedit.h"
 #include "../windows/newitem.h"
 #include "../windows/settings.h"
+#include <stdbool.h>
 
 typedef struct {
     ToolbarState toolbar;
@@ -15,9 +17,11 @@ typedef struct {
     EditItemState editItem;
     SettingsState settings;
     CanvasState canvas;
+    InfoEditState infoEdit;
 } UiStates;
 
 UiStates *NewUiStates();
 void FreeUiStates(UiStates *states);
+bool WindowPopupActive(UiStates *states);
 
 #endif

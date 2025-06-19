@@ -1,8 +1,11 @@
 #include "../include/widgets/toolbar.h"
+#include "../include/colors.h"
 #include "../include/ext/raygui.h"
 #include "../include/ext/raylib.h"
 #include <stdbool.h>
 #include <string.h>
+
+#define SEP_THICKNESS 1
 
 ToolbarState CreateToolbar(int height) {
     return (ToolbarState){
@@ -20,6 +23,7 @@ ToolbarState CreateToolbar(int height) {
         .saveBtnClicked = false,
         .settingsBtnClicked = false,
         .helpBtnClicked = false,
+        .glyphOptBtnClicked = false,
     };
 }
 
@@ -49,6 +53,22 @@ void Toolbar(ToolbarState *state) {
 
     state->saveBtnClicked =
         GuiButton(btnBound, GuiIconText(ICON_FILE_SAVE, "~save"));
+
+    btnBound.x += leftIncrement;
+
+    DrawLineEx(
+        (Vector2){.x = btnBound.x, .y = state->bounds.y},
+        (Vector2){
+            .x = btnBound.x,
+            .y = state->bounds.height + state->bounds.x,
+        },
+        SEP_THICKNESS, ColorGrayLightest
+    );
+
+    btnBound.x += 10;
+
+    state->glyphOptBtnClicked =
+        GuiButton(btnBound, GuiIconText(ICON_FILETYPE_INFO, NULL));
 
     btnBound.x = state->bounds.width - TOOL_MARGIN - btnBound.width;
 
