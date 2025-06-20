@@ -27,6 +27,6 @@ typedef struct {
 } ItemSelectorState;
 
 ItemSelectorState CreateItemSelector(int width, int topSkip, int bottomSkip);
-void ItemSelector(ItemSelectorState *state, GlyphItemList *list);
+void ItemSelector(ItemSelectorState *state, GlyphObj *glyph);
 
 #endif

@@ -57,13 +57,11 @@ bool SaveFontFileAsBfont(const GlyphObj *glyph, const char *filename) {
     fprintf(fptr, "LICENSE: %s\n", glyph->license);
     fprintf(fptr, "DESCRIPTION: %s\n", glyph->description);
 
-    for (int i = 0; i < glyph->glyphs->len; i++) {
-        fprintf(
-            fptr, "%d\n%s\n", glyph->glyphs->items[i]->value,
-            glyph->glyphs->names[i]
-        );
+    int len = glyph->count;
+    for (int i = 0; i < len; i++) {
+        fprintf(fptr, "%d\n%s\n", glyph->glyphs[i]->value, glyph->gnames[i]);
         for (int j = 0; j < 8; j++) {
-            fprintf(fptr, "%d", glyph->glyphs->items[i]->bits[j]);
+            fprintf(fptr, "%d", glyph->glyphs[i]->bits[j]);
         }
         fprintf(fptr, "\n");
     }

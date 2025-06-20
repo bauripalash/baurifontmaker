@@ -51,6 +51,16 @@ void SetGlyphItemName(GlyphItem *gi, const char *name) {
     if (name == NULL) {
         return;
     }
+
+    char *tempName = (char *)balloc((strlen(name) + 1) * sizeof(char));
+    if (tempName == NULL) {
+        return;
+    }
+
+    bfree(gi->name);
+    strcpy(tempName, name);
+    gi->name = tempName;
+    // NOTE: Add Error checking
 }
 
 bool GlyphItemFlipBit(GlyphItem *fi, uint8_t col, uint8_t row) {

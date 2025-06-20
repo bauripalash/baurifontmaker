@@ -4,7 +4,24 @@ ZIG_OUTPUT:=zig-out/bin/$(BIN)
 HEADERS:= $(shell find src/include -path 'src/external' -prune -o -path 'src/include/exported' -prune -o -name '*.h' -print)
 SOURCES:= $(shell find src/ -path 'src/external' -prune -o -name '*.c' -print)
 
-all: crun
+all: run
+
+.PHONY: build
+build:
+	cmake --build build
+
+.PHONY: build_rls
+build_rls:
+	cmake --build build --config Release
+
+.PHONY: run
+run: build
+	./$(CMAKE_OUTPUT)
+
+.PHONY: cmake_setup
+cmake_setup:
+	cmake -S . -B build
+	make cbuild
 
 .PHONY: zbuild
 zbuild:
@@ -14,22 +31,6 @@ zbuild:
 zrun:
 	zig build run
 
-.PHONY: cbuild
-cbuild:
-	cmake --build build
-
-.PHONY: cbuild_rls
-cbuild_rls:
-	cmake --build build --config Release
-
-.PHONY: crun
-crun: cbuild
-	./$(CMAKE_OUTPUT)
-
-.PHONY: csetup
-csetup:
-	cmake -S . -B build
-	make cbuild
 
 .PHONY: fmt
 fmt:

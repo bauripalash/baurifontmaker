@@ -55,7 +55,7 @@ void itemCtrlBtns(ItemSelectorState *state, float x, float y) {
     );
 }
 
-void ItemSelector(ItemSelectorState *state, GlyphItemList *list) {
+void ItemSelector(ItemSelectorState *state, GlyphObj *glyph) {
 
     Rectangle itemPanelBounds =
         (Rectangle){ITEM_PANEL_MARGIN, state->topSkip, state->width,
@@ -76,7 +76,8 @@ void ItemSelector(ItemSelectorState *state, GlyphItemList *list) {
                     state->width - (ITEM_PANEL_PADDING * 2),
                     itemPanelBounds.height - ITEM_PANEL_CTRL_BTN_HEIGHT -
                         (ITEM_PANEL_PADDING * 3)},
-        list->names, list->len, &state->index, &state->active, &state->focus
+        glyph->gnames, glyph->count, &state->index, &state->active,
+        &state->focus
 
     );
 
@@ -86,7 +87,7 @@ void ItemSelector(ItemSelectorState *state, GlyphItemList *list) {
 
     int rawFocus = state->focus;
     if (rawFocus != -1 && rawFocus != state->active) {
-        GlyphItem *currentItem = list->items[rawFocus];
+        GlyphItem *currentItem = glyph->glyphs[rawFocus];
         Vector2 mousePos = GetMousePosition();
         Rectangle hoverRect = {
             mousePos.x + 10, mousePos.y + 10, CELL_SIZE * 10, CELL_SIZE * 10

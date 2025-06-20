@@ -81,7 +81,7 @@ Gui *NewGUI(GuiPrelimError *err) {
         return NULL;
     }
 
-    ui->currentItem = ui->glyph->glyphs->items[0];
+    ui->currentItem = ui->glyph->glyphs[0];
     ui->apperr = APPERR_OK;
 
     *err = PRELIM_OK;
@@ -277,6 +277,16 @@ void handleEditItemWindow(Gui *ui) {
 
     if (result == EDIT_SAVE_CLICK) {
         TraceLog(ICON_WARNING, "Clicked Save");
+        if (!TextIsEqual(ui->states->editItem.nameStr, ui->currentItem->name)) {
+            TraceLog(
+                ICON_WARNING, "Name is Not Equal : old:%s | new:%s",
+                ui->currentItem->name, ui->states->editItem.nameStr
+            );
+            RenameGlyphItem(
+                ui->glyph, ui->currentItem->listIndex,
+                ui->states->editItem.nameStr
+            );
+        }
     } else if (result == EDIT_REMOVE_CLICK) {
 
         TraceLog(ICON_WARNING, "Clicked Remove");
@@ -287,7 +297,7 @@ void handleEditItemWindow(Gui *ui) {
 
 void handleItemSelector(Gui *ui) {
 
-    ui->currentItem = ui->glyph->glyphs->items[ui->states->itemSelector.active];
+    ui->currentItem = ui->glyph->glyphs[ui->states->itemSelector.active];
 }
 
 void updateConfigFromSettings(Gui *ui) {
@@ -406,7 +416,7 @@ void Layout(Gui *ui) {
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
     Canvas(&ui->states->canvas, ui->conf, ui->currentItem);
-    ItemSelector(&ui->states->itemSelector, ui->glyph->glyphs);
+    ItemSelector(&ui->states->itemSelector, ui->glyph);
 
     handleItemSelector(ui);
     StatusBarLayout(ui);
@@ -473,7 +483,7 @@ void StatusBarLayout(Gui *ui) {
     int hoverIndex = ui->states->itemSelector.focus;
     int hoverPosX = ui->states->canvas.hoverPosX;
     int hoverPosY = ui->states->canvas.hoverPosY;
-    GlyphItem *hoveredFontItem = ui->glyph->glyphs->items[hoverIndex];
+    GlyphItem *hoveredFontItem = ui->glyph->glyphs[hoverIndex];
     Rectangle statusBarRect = (Rectangle){
         0,
         ui->winHeight - ui->conf->statusbarHeight,
