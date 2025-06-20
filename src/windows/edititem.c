@@ -1,5 +1,5 @@
 #include "../include/windows/edititem.h"
-#include "../include/ext/raygui.h"
+#include "../external/raygui.h"
 #include "../include/utils.h"
 
 #include <stdbool.h>

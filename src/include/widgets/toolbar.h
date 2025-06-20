@@ -1,7 +1,7 @@
 #ifndef TOOLBAR_H
 #define TOOLBAR_H
 
-#include "../ext/raylib.h"
+#include "../../external/raylib.h"
 #include <stdbool.h>
 
 #define TOOL_MARGIN  5

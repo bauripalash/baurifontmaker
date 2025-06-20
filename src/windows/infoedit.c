@@ -1,6 +1,6 @@
 #include "../include/windows/infoedit.h"
-#include "../include/ext/raygui.h"
-#include "../include/objects/glyph.h"
+#include "../external/raygui.h"
+#include "../include/glyph.h"
 #include <stdbool.h>
 #include <string.h>
 

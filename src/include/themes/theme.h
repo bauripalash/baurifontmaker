@@ -3,8 +3,10 @@
 
 // clang-format off
 #include "../colors.h"
+
+#include "../../external/raylib.h"
+#include "../../external/raygui.h"
 #include "../exported/bgmlogo.h"
-#include "../ext/raygui.h"
 #include "../exported/ibmplexmonofont.h"
 // clang-format on
 

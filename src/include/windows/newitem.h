@@ -1,7 +1,7 @@
 #ifndef WIN_NEWITEM_H
 #define WIN_NEWITEM_H
 
-#include "../ext/raylib.h"
+#include "../../external/raylib.h"
 
 #include <stdbool.h>
 

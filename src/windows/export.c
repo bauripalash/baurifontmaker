@@ -1,8 +1,8 @@
 #include "../include/windows/export.h"
+#include "../external/raygui.h"
 #include "../include/balloc.h"
 #include "../include/codegen.h"
-#include "../include/ext/raygui.h"
-#include "../include/objects/glyph.h"
+#include "../include/glyph.h"
 #include <stdbool.h>
 #include <stdlib.h>
 

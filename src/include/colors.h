@@ -1,7 +1,7 @@
 #ifndef _COLORS_H_
 #define _COLORS_H_
 
-#include "ext/raylib.h"
+#include "../external/raylib.h"
 
 // Penginette18 Palette
 // Source: https://lospec.com/palette-list/penginette18

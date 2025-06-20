@@ -1,7 +1,7 @@
-#include "../include/objects/glyphitem.h"
-#include "../include/ext/raylib.h"
+#include "include/glyphitem.h"
+#include "external/raylib.h"
 
-#include "../include/balloc.h"
+#include "include/balloc.h"
 
 #include <stdbool.h>
 #include <stddef.h>

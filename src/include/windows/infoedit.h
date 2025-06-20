@@ -1,7 +1,7 @@
 #ifndef INFO_EDIT_H
 #define INFO_EDIT_H
-#include "../ext/raylib.h"
-#include "../objects/glyph.h"
+#include "../../external/raylib.h"
+#include "../glyph.h"
 
 #include <stdbool.h>
 #define INFO_W_MARGIN 30

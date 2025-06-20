@@ -1,5 +1,5 @@
+#include "../external/raylib.h"
 #include "../include/converter.h"
-#include "../include/ext/raylib.h"
 #include <stdio.h>
 
 #define TEMP_FILE "/home/palash/work/mcu/cc/exp2/tempfont.bdf"

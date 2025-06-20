@@ -1,6 +1,6 @@
 #include "include/saver.h"
-#include "include/ext/raylib.h"
-#include "include/objects/glyph.h"
+#include "external/raylib.h"
+#include "include/glyph.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>

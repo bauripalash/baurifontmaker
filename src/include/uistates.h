@@ -1,14 +1,14 @@
 #ifndef UISTATES_H
 #define UISTATES_H
 
-#include "../widgets/canvas.h"
-#include "../widgets/itemselector.h"
-#include "../widgets/toolbar.h"
-#include "../windows/edititem.h"
-#include "../windows/export.h"
-#include "../windows/infoedit.h"
-#include "../windows/newitem.h"
-#include "../windows/settings.h"
+#include "widgets/canvas.h"
+#include "widgets/itemselector.h"
+#include "widgets/toolbar.h"
+#include "windows/edititem.h"
+#include "windows/export.h"
+#include "windows/infoedit.h"
+#include "windows/newitem.h"
+#include "windows/settings.h"
 #include <stdbool.h>
 
 typedef struct {

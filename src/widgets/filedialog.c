@@ -4,9 +4,9 @@
 // tinyfiledialogs need to below these system headers
 // to get wchar_t definition on windows
 
-#include "../include/ext/raylib.h"
+#include "../external/raylib.h"
 #ifndef BFM_OS_WEB
-#include "../include/ext/tinyfiledialogs/tinyfiledialogs.h"
+#include "../external/tinyfiledialogs/tinyfiledialogs.h"
 #endif
 #include "../include/widgets/filedialog.h"
 

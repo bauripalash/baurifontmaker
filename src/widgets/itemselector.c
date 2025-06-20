@@ -1,7 +1,7 @@
 #include "../include/widgets/itemselector.h"
+#include "../external/raygui.h"
+#include "../external/raylib.h"
 #include "../include/colors.h"
-#include "../include/ext/raygui.h"
-#include "../include/ext/raylib.h"
 #include <stdbool.h>
 #include <string.h>
 

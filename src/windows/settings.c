@@ -1,7 +1,7 @@
 #include "../include/windows/settings.h"
+#include "../external/raygui.h"
 #include "../include/colors.h"
 #include "../include/defaults.h"
-#include "../include/ext/raygui.h"
 #include "../include/utils.h"
 #include <stdbool.h>
 #include <stdio.h>

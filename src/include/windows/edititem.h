@@ -1,8 +1,8 @@
 #ifndef WIN_EDITITEM_H
 #define WIN_EDITITEM_H
 
-#include "../ext/raylib.h"
-#include "../objects/glyphitem.h"
+#include "../../external/raylib.h"
+#include "../glyphitem.h"
 
 #include <stdbool.h>
 

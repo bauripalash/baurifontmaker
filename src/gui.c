@@ -1,15 +1,15 @@
 #include "include/gui.h"
+#include "external/raylib.h"
 #include "include/codegen.h"
 #include "include/colors.h"
 #include "include/config.h"
 #include "include/converter.h"
 #include "include/defaults.h"
-#include "include/ext/raylib.h"
-#include "include/objects/glyph.h"
-#include "include/objects/glyphitem.h"
-#include "include/objects/uiconfig.h"
-#include "include/objects/uistates.h"
+#include "include/glyph.h"
+#include "include/glyphitem.h"
 #include "include/saver.h"
+#include "include/uiconfig.h"
+#include "include/uistates.h"
 #include "include/utils.h"
 #include "include/widgets/canvas.h"
 #include "include/widgets/filedialog.h"
@@ -26,7 +26,7 @@
 #include "include/themes/theme.h"
 
 #define RAYGUI_IMPLEMENTATION
-#include "include/ext/raygui.h"
+#include "external/raygui.h"
 
 #include <stdbool.h>
 #include <stdio.h>

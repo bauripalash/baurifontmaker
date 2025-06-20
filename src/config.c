@@ -2,8 +2,8 @@
 #include "include/defaults.h"
 #include <stdbool.h>
 #define RINI_IMPLEMENTATION
-#include "include/ext/raylib.h"
-#include "include/ext/rini.h"
+#include "external/raylib.h"
+#include "external/rini.h"
 
 #define TEMP_FILE             "/home/palash/work/mcu/cc/exp2/bauriglyphmaker.ini"
 #define VERSION_KEY           "VERSION"

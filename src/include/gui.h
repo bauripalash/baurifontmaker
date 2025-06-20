@@ -4,11 +4,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "ext/raylib.h"
-#include "objects/glyph.h"
-#include "objects/glyphitem.h"
-#include "objects/uiconfig.h"
-#include "objects/uistates.h"
+#include "../external/raylib.h"
+#include "glyph.h"
+#include "glyphitem.h"
+#include "uiconfig.h"
+#include "uistates.h"
 
 typedef enum {
     PRELIM_OK = 0,

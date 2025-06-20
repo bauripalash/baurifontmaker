@@ -1,7 +1,7 @@
 #ifndef UICONFIG_H
 #define UICONFIG_H
 
-#include "../ext/raylib.h"
+#include "../external/raylib.h"
 
 typedef struct {
     int gridBtnSize;

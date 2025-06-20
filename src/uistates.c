@@ -1,7 +1,7 @@
-#include "../include/objects/uistates.h"
-#include "../include/balloc.h"
-#include "../include/defaults.h"
-#include "../include/widgets/canvas.h"
+#include "include/uistates.h"
+#include "include/balloc.h"
+#include "include/defaults.h"
+#include "include/widgets/canvas.h"
 
 UiStates *NewUiStates() {
 

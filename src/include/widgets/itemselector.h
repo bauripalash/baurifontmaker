@@ -1,6 +1,6 @@
 #ifndef ITEM_SELECTOR_H
 #define ITEM_SELECTOR_H
-#include "../objects/glyph.h"
+#include "../glyph.h"
 #include <stdbool.h>
 
 #define ITEM_PANEL_PADDING          10

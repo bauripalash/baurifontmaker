@@ -1,6 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include "ext/raylib.h"
+#include "../external/raylib.h"
 #include <stdbool.h>
 
 #define OS_NAME_LINUX 0

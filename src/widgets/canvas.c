@@ -1,7 +1,8 @@
 #include "../include/widgets/canvas.h"
-#include "../include/ext/raygui.h"
-#include "../include/objects/glyphitem.h"
+#include "../external/raygui.h"
+#include "../include/glyphitem.h"
 #include "../include/widgets/itemselector.h"
+
 #include <math.h>
 #include <stdbool.h>
 

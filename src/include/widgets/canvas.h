@@ -1,8 +1,8 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "../objects/glyphitem.h"
-#include "../objects/uiconfig.h"
+#include "../glyphitem.h"
+#include "../uiconfig.h"
 
 #define CANVAS_PANEL_MARGIN 20
 

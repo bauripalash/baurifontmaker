@@ -1,6 +1,6 @@
-#include "../include/objects/glyph.h"
-#include "../include/balloc.h"
-#include "../include/ext/raygui.h"
+#include "include/glyph.h"
+#include "external/raygui.h"
+#include "include/balloc.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>

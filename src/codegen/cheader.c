@@ -1,5 +1,5 @@
+#include "../external/raylib.h"
 #include "../include/codegen.h"
-#include "../include/ext/raylib.h"
 #include <stdbool.h>
 #include <stdlib.h>
 

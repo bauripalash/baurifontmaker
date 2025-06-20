@@ -1,7 +1,7 @@
 #ifndef EXPORT_H
 #define EXPORT_H
-#include "../ext/raylib.h"
-#include "../objects/glyph.h"
+#include "../../external/raylib.h"
+#include "../glyph.h"
 #include <stdbool.h>
 #define EXPORT_W_WIDTH     700
 #define EXPORT_W_HEIGHT    500

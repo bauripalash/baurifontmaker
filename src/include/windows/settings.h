@@ -1,7 +1,7 @@
 #ifndef WIN_SETTINGS_H
 #define WIN_SETTINGS_H
 
-#include "../ext/raylib.h"
+#include "../../external/raylib.h"
 #include <stdbool.h>
 
 #define SETTINGS_WIN_WIDTH  500

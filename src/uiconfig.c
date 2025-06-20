@@ -1,7 +1,7 @@
-#include "../include/objects/uiconfig.h"
-#include "../include/balloc.h"
-#include "../include/colors.h"
-#include "../include/defaults.h"
+#include "include/uiconfig.h"
+#include "include/balloc.h"
+#include "include/colors.h"
+#include "include/defaults.h"
 
 UiConfig *NewUiConfig() {
     UiConfig *uc = (UiConfig *)bcalloc(1, sizeof(UiConfig));
