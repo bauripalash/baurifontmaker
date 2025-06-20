@@ -37,11 +37,11 @@ fmt:
 	@clang-format -i -style=file --verbose $(SOURCES) $(HEADERS)
 
 .PHONY:valgrind
-valgrind: cbuild
+valgrind: build
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(CMAKE_OUTPUT) > valgrind.log 2>&1
 
 .PHONY: massif
-massif: cbuild
+massif: build
 	valgrind --tool=massif $(CMAKE_OUTPUT)
 
 .PHONY: perf
@@ -54,7 +54,7 @@ valgrind_z: zbuild
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(ZIG_OUTPUT) > valgrind.log 2>&1
 
 .PHONY: infer
-infer: clean
+infer: cmake_clean
 	infer run --compilation-database build/compile_commands.json
 
 .PHONY: cppcheck
