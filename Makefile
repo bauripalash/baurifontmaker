@@ -68,6 +68,10 @@ cppcheck:
 		-ibuild/_deps -isrc/include/ext 2>cppcheck-result.txt
 
 
+.PHONY: print_sources
+print_sources:
+	@echo $(SOURCES)
+
 .PHONY: cmake_clean
 cmake_clean:
 	make clean -C build

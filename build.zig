@@ -41,25 +41,42 @@ pub fn build(b: *std.Build) void {
     }
 
     exe.addIncludePath(b.path("src/include/"));
-    exe.addIncludePath(b.path("src/include/ext/tinyfiledialogs/"));
+    exe.addIncludePath(b.path("src/external/"));
+    exe.addIncludePath(b.path("src/external/stb"));
+    exe.addIncludePath(b.path("src/external/tinyfiledialogs/"));
 
     exe.addCSourceFiles(.{
         .files = &.{
-            "src/fontitem.c",
-            "src/fontitemlist.c",
+            "src/config.c",
+            "src/glyph.c",
+            "src/glyphitem.c",
             "src/gui.c",
-            "src/itemselector.c",
-            "src/toolbar.c",
+            "src/saver.c",
+            "src/uiconfig.c",
+            "src/uistates.c",
             "src/utils.c",
-            "src/uiopts.c",
 
-            "src/filedialog.c",
+            //codegen
+            "src/codegen/cheader.c",
 
+            //converters
+            "src/converters/bdf.c",
+
+            //widgets
+            "src/widgets/canvas.c",
+            "src/widgets/filedialog.c",
+            "src/widgets/itemselector.c",
+            "src/widgets/toolbar.c",
+
+            //windows
             "src/windows/edititem.c",
+            "src/windows/export.c",
+            "src/windows/infoedit.c",
             "src/windows/newitem.c",
+            "src/windows/settings.c",
 
-            //external
-            "src/include/ext/tinyfiledialogs/tinyfiledialogs.c",
+            //externals / third_party
+            "src/external/tinyfiledialogs/tinyfiledialogs.c",
         },
         .flags = &.{"-g3"},
     });
