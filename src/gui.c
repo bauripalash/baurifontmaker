@@ -333,6 +333,7 @@ void handleExportWindow(Gui *ui) {
 
         if (ui->states->export.codeBtnClicked) {
             ClearExportBuffer(&ui->states->export);
+            // ui->states->export.buffer = LoadFileText("LICENSE");
             ui->states->export.buffer = GenerateCHeader(ui->glyph);
             ui->states->export.codeBtnClicked = false;
         }

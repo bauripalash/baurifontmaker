@@ -5,6 +5,7 @@
 #define DEF_WIN_HEIGHT       640
 #define DEF_WIN_WIDTH        800
 #define DEF_WIN_TITLE        "BauriGlyphMaker"
+#define DEF_FONT_SIZE        16
 
 #define DEF_ERR_WIN_WIDTH    500
 #define DEF_ERR_WIN_HEIGHT   200

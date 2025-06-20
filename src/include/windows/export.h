@@ -13,6 +13,10 @@ typedef struct {
     Rectangle windowBounds;
     char *buffer;
     bool codeBtnClicked;
+    Vector2 scrollOffset;
+    Rectangle scrollView;
+    Font font;
+    int codeHeight;
 
 } ExportState;
 
