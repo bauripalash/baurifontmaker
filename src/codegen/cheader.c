@@ -3,36 +3,16 @@
 #include "../include/codegen.h"
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
-// 1024 * 1024
-#define MAX_CODE_SIZE 1048576
-
-static const char *template = "\
-/*******************************\n\
-*\n\
-* Glyphs Generated With BauriGlyphMaker v${VERSION} \n\
-* Name : ${NAME}\n\
-* Author : ${AUTHOR}\n\
-* License : ${LICENSE}\n\
-* Description: ${DESCRIPTION}\n\
-********************************/\n\
-\n\
-${CODE}\n\
-";
-
-bool getCode(const GlyphObj *obj, char *buffer);
+static bool getCode(const GlyphObj *obj, char *buffer);
 
 char *GenerateCHeader(const GlyphObj *glyph) {
-    char *name = TextReplace(template, "${NAME}", glyph->name);
-    char *author = TextReplace(name, "${AUTHOR}", glyph->author);
-    MemFree(name);
-    char *license = TextReplace(author, "${LICENSE}", glyph->license);
-    MemFree(author);
-    char *desc = TextReplace(license, "${DESCRIPTION}", glyph->description);
-    MemFree(license);
 
-    char *codeBuffer = (char *)balloc(MAX_CODE_SIZE * sizeof(char));
+    char *header = GetFilledHeader(C_TEMPLATE, glyph);
+
+    char *codeBuffer = (char *)balloc(MAX_CODEGEN_SIZE * sizeof(char));
     char *src = NULL;
 
     if (codeBuffer == NULL) {
@@ -45,13 +25,12 @@ char *GenerateCHeader(const GlyphObj *glyph) {
             src = codeBuffer;
         }
     }
-    printf("CODE -> \n%s\n", src);
-    char *code = TextReplace(desc, "${CODE}", src);
+    char *code = TextReplace(header, "${CODE}", src);
 
     if (codeBuffer != NULL) {
         bfree(codeBuffer);
     }
-    MemFree(desc);
+    MemFree(header);
     return code;
 }
 
@@ -60,27 +39,54 @@ bool getCode(const GlyphObj *obj, char *buffer) {
     int pos = 0;
     char *nameUpper = TextToUpper(obj->name);
     TextAppend(
-        buffer, TextFormat("#define %s_HEIGHT %d\n", nameUpper, -100), &pos
-    );
-
-    TextAppend(
-        buffer, TextFormat("#define %s_WIDTH %d\n", nameUpper, -100), &pos
-    );
-
-    TextAppend(
-        buffer,
-        TextFormat("const int[%d] %s_CODEPOINTS = {\n", obj->count, nameUpper),
+        buffer, TextFormat("#define %s_GLYPH_HEIGHT %d\n", nameUpper, -100),
         &pos
     );
-    for (int i = 0; i < obj->count; i++) {
+
+    TextAppend(
+        buffer, TextFormat("#define %s_GLYPH_WIDTH %d\n", nameUpper, -100), &pos
+    );
+
+    int count = obj->count;
+    TextAppend(
+        buffer, TextFormat("#define %s_GLYPH_COUNT %d\n\n", nameUpper, count),
+        &pos
+    );
+    TextAppend(
+        buffer,
+        TextFormat(
+            "const int %s_CODEPOINTS[%s_GLYPH_COUNT] = {\n", nameUpper,
+            nameUpper
+        ),
+        &pos
+    );
+    for (int i = 0; i < count; i++) {
         int codepoint = obj->glyphs[i]->value;
         char *name = obj->glyphs[i]->name;
         TextAppend(
-            buffer, TextFormat("    0x%X, //%s\n", codepoint, name), &pos
+            buffer, TextFormat("    0x%X,    //%s\n", codepoint, name), &pos
         );
     }
 
-    TextAppend(buffer, "};", &pos);
+    TextAppend(
+        buffer,
+        TextFormat(
+            "};\n\nconst int %s_GLYPH_DATA[%s_GLYPH_COUNT][7]= {\n", nameUpper,
+            nameUpper
+        ),
+        &pos
+    );
+
+    for (int i = 0; i < count; i++) {
+        char *name = obj->glyphs[i]->name;
+        uint8_t *code = obj->glyphs[i]->bits;
+        TextAppend(buffer, "    {", &pos);
+        for (int j = 0; j < 8; j++) {
+            TextAppend(buffer, TextFormat("0x%X, ", code[j]), &pos);
+        }
+        TextAppend(buffer, TextFormat("},    //%s\n", name), &pos);
+    }
+    TextAppend(buffer, "};\n", &pos);
 
     return true;
 }

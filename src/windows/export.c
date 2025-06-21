@@ -1,7 +1,6 @@
 #include "../include/windows/export.h"
 #include "../external/raygui.h"
 #include "../include/balloc.h"
-#include "../include/codegen.h"
 #include "../include/colors.h"
 #include "../include/glyph.h"
 #include <stdbool.h>
@@ -14,11 +13,17 @@ ExportState CreateExportState() {
     state.windowActive = false;
     state.windowBounds = (Rectangle){0, 0, EXPORT_W_WIDTH, EXPORT_W_HEIGHT};
     state.buffer = NULL;
-    state.codeBtnClicked = false;
+    state.saveBtnClicked = false;
     state.scrollOffset = (Vector2){0, 0};
     state.scrollView = (Rectangle){0};
     state.font = GuiGetFont();
     state.codeHeight = 20;
+    state.langSelectActive = 0;
+    state.langSelectEdit = false;
+    state.typeSelectActive = false;
+    state.typeSelectActive = 0;
+    state.fontTypeActive = 0;
+    state.fontTypeEdit = false;
 
     return state;
 }
@@ -101,13 +106,22 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
 
         int x = winposX + EXPORT_W_MARGIN;
         int y = winposY + EXPORT_W_MARGIN + 10;
-        state->codeBtnClicked =
-            GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Code");
+        Rectangle typeSelectRect = {
+            x,
+            y,
+            200,
+            32,
+        };
+        // state->codeBtnClicked =
+        //     GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Code");
 
-        x += EXPORT_W_MARGIN + BTN_W;
+        x += EXPORT_W_MARGIN + 200;
 
-        bool fcode = GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Font");
+        Rectangle dropDownRect = {x, y, 200, BTN_H};
 
+        x += EXPORT_W_MARGIN + 200;
+
+        Rectangle saveBtnRect = {x, y, BTN_W, BTN_H};
         x = winposX + EXPORT_W_MARGIN;
         y += BTN_H + EXPORT_W_MARGIN;
         Rectangle codeBoxRect = (Rectangle){
@@ -125,6 +139,38 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
         ScrollTextWidget(state, codeBoxRect, state->buffer);
         if (state->buffer == NULL) {
             GuiEnable();
+        }
+
+        if (state->typeSelectActive == TYPE_SEL_CODE) {
+            if (GuiDropdownBox(
+                    dropDownRect, LANG_SEL_STR, &state->langSelectActive,
+                    state->langSelectEdit
+                )) {
+                state->langSelectEdit = !state->langSelectEdit;
+            }
+        } else if (state->typeSelectActive == TYPE_SEL_FONT) {
+            if (GuiDropdownBox(
+                    dropDownRect, FONT_SEL_STR, &state->fontTypeActive,
+                    state->fontTypeEdit
+                )) {
+                state->fontTypeEdit = !state->fontTypeEdit;
+            }
+        }
+
+        if (GuiDropdownBox(
+                typeSelectRect, TYPE_SEL_STR, &state->typeSelectActive,
+                state->typeSelectEdit
+            )) {
+            state->typeSelectEdit = !state->typeSelectEdit;
+        }
+
+        state->saveBtnClicked =
+            GuiButton(saveBtnRect, GuiIconText(ICON_FILE_SAVE, "Save File"));
+
+        if (state->saveBtnClicked) {
+            // DO STUFF HERE
+            state->saveBtnClicked = false; // to remove?
+            state->windowActive = false;
         }
     }
 

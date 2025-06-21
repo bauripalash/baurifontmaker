@@ -322,6 +322,55 @@ void handleInfoEditWindow(Gui *ui) {
     }
 }
 
+void fillExportOutput(Gui *ui) {
+    UiStates *states = ui->states;
+    int type = states->export.typeSelectActive;
+    int subtype = -1;
+
+    ClearExportBuffer(&states->export);
+    if (type == TYPE_SEL_CODE) {
+        subtype = states->export.langSelectActive;
+        switch (subtype) {
+        case LANG_SEL_CHEADER: {
+            states->export.buffer = GenerateCHeader(ui->glyph);
+            break;
+        }
+
+        case LANG_SEL_PYTHON: {
+            states->export.buffer = GeneratePython(ui->glyph);
+            // TraceLog(LOG_WARNING, "Python Code Export Not Yet Available");
+            break;
+        }
+
+        case LANG_SEL_RUST: {
+            states->export.buffer = GenerateRust(ui->glyph);
+            // TraceLog(LOG_WARNING, "Rust Code Export Not Yet Available");
+            break;
+        }
+        }
+    } else if (type == TYPE_SEL_FONT) {
+        subtype = states->export.fontTypeActive;
+        switch (subtype) {
+        case FONT_SEL_BDF: {
+            // TraceLog(LOG_WARNING, "BDF Font Export Not Yet Available");
+            break;
+        }
+
+        case FONT_SEL_TTF: {
+            // TraceLog(LOG_WARNING, "TTF Font Export Not Yet Available");
+            break;
+        }
+
+        case FONT_SEL_OTF: {
+            // TraceLog(LOG_WARNING, "OTF Font Export Not Yet Available");
+            break;
+        }
+        }
+    } else {
+        return;
+    }
+}
+
 void handleExportWindow(Gui *ui) {
 
     if (ui->states->toolbar.exportBtnClicked) {
@@ -331,12 +380,7 @@ void handleExportWindow(Gui *ui) {
     if (ui->states->export.windowActive) {
         bool result = ExportWindow(&ui->states->export, ui->glyph);
 
-        if (ui->states->export.codeBtnClicked) {
-            ClearExportBuffer(&ui->states->export);
-            // ui->states->export.buffer = LoadFileText("LICENSE");
-            ui->states->export.buffer = GenerateCHeader(ui->glyph);
-            ui->states->export.codeBtnClicked = false;
-        }
+        fillExportOutput(ui);
     } else {
         ClearExportBuffer(&ui->states->export);
     }
