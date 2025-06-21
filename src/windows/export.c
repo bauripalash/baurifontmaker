@@ -3,7 +3,6 @@
 #include "../include/balloc.h"
 #include "../include/codegen.h"
 #include "../include/colors.h"
-#include "../include/defaults.h"
 #include "../include/glyph.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -101,7 +100,7 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
         );
 
         int x = winposX + EXPORT_W_MARGIN;
-        int y = winposY + EXPORT_W_MARGIN;
+        int y = winposY + EXPORT_W_MARGIN + 10;
         state->codeBtnClicked =
             GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Code");
 
