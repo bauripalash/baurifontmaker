@@ -71,7 +71,7 @@ bool getCode(const GlyphObj *obj, char *buffer) {
     TextAppend(
         buffer,
         TextFormat(
-            "};\n\nconst int %s_GLYPH_DATA[%s_GLYPH_COUNT][7]= {\n", nameUpper,
+            "};\n\nconst int %s_GLYPH_DATA[%s_GLYPH_COUNT][8]= {\n", nameUpper,
             nameUpper
         ),
         &pos

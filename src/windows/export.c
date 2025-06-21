@@ -3,6 +3,7 @@
 #include "../include/balloc.h"
 #include "../include/colors.h"
 #include "../include/glyph.h"
+#include "../include/widgets/filedialog.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -34,7 +35,7 @@ void ClearExportBuffer(ExportState *state) {
         state->buffer = NULL;
     }
 }
-#define BTN_W   80
+#define BTN_W   150
 #define BTN_H   30
 #define SPACING 2
 #define LINE_H  20
@@ -166,12 +167,6 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
 
         state->saveBtnClicked =
             GuiButton(saveBtnRect, GuiIconText(ICON_FILE_SAVE, "Save File"));
-
-        if (state->saveBtnClicked) {
-            // DO STUFF HERE
-            state->saveBtnClicked = false; // to remove?
-            state->windowActive = false;
-        }
     }
 
     return false;

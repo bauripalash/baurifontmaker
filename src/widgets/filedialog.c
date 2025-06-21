@@ -36,7 +36,26 @@ bool OpenFileDialog(
 }
 bool SaveFileDialog(
     const char *title, char *filename, const char *filters, const char *msg
-);
+) {
+    bool result = false;
+#ifndef BFM_OS_WEB
+    int numFilters = 0;
+    const char **filterList =
+        (const char **)TextSplit(filters, ';', &numFilters);
+
+    char *temp =
+        tinyfd_saveFileDialog(title, filename, numFilters, filterList, msg);
+
+    if (temp != NULL) {
+        strcpy(filename, temp);
+        result = true;
+    }
+
+    return result;
+#else
+    return false;
+#endif
+}
 
 void MessageDialog(const char *title, const char *msg) {
 #ifndef BFM_OS_WEB

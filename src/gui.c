@@ -322,10 +322,20 @@ void handleInfoEditWindow(Gui *ui) {
     }
 }
 
-void fillExportOutput(Gui *ui) {
+void fillExportOutput(Gui *ui, bool save) {
     UiStates *states = ui->states;
     int type = states->export.typeSelectActive;
     int subtype = -1;
+    bool saveResult = false;
+    char *saveFilename = NULL;
+
+    if (save) {
+        saveFilename = (char *)bcalloc(512, sizeof(char));
+        if (saveFilename == NULL) {
+            TraceLog(LOG_ERROR, "Failed to save file");
+            return;
+        }
+    }
 
     ClearExportBuffer(&states->export);
     if (type == TYPE_SEL_CODE) {
@@ -333,6 +343,18 @@ void fillExportOutput(Gui *ui) {
         switch (subtype) {
         case LANG_SEL_CHEADER: {
             states->export.buffer = GenerateCHeader(ui->glyph);
+            if (save) {
+                saveResult = SaveFileDialog(
+                    "Export File to C Header", saveFilename, "*.h;*.c",
+                    "C Header (*.h)"
+                );
+                if (saveResult) {
+                    if (!SaveFileText(saveFilename, states->export.buffer)) {
+                        TraceLog(LOG_ERROR, "Failed to save C Header");
+                        // Add Error handling with gui
+                    }
+                }
+            }
             break;
         }
 
@@ -352,6 +374,7 @@ void fillExportOutput(Gui *ui) {
         subtype = states->export.fontTypeActive;
         switch (subtype) {
         case FONT_SEL_BDF: {
+            states->export.buffer = GenerateBDFFont(ui->glyph);
             // TraceLog(LOG_WARNING, "BDF Font Export Not Yet Available");
             break;
         }
@@ -366,8 +389,10 @@ void fillExportOutput(Gui *ui) {
             break;
         }
         }
-    } else {
-        return;
+    }
+
+    if (saveFilename != NULL) {
+        bfree(saveFilename);
     }
 }
 
@@ -380,7 +405,12 @@ void handleExportWindow(Gui *ui) {
     if (ui->states->export.windowActive) {
         bool result = ExportWindow(&ui->states->export, ui->glyph);
 
-        fillExportOutput(ui);
+        fillExportOutput(ui, ui->states->export.saveBtnClicked);
+
+        if (ui->states->export.saveBtnClicked) {
+            ui->states->export.saveBtnClicked = false;
+            ui->states->export.windowActive = false;
+        }
     } else {
         ClearExportBuffer(&ui->states->export);
     }
@@ -421,7 +451,6 @@ void handleToolbar(Gui *ui) {
             TraceLog(LOG_ERROR, "Failed to save file");
         }
 
-        isok = ExportToBDF(ui->glyph, NULL);
         ui->states->toolbar.saveBtnClicked = false;
     }
 
