@@ -38,13 +38,13 @@ bool getCode(const GlyphObj *obj, char *buffer) {
 
     int pos = 0;
     char *nameUpper = TextToUpper(obj->name);
-    TextAppend(
-        buffer, TextFormat("#define %s_GLYPH_HEIGHT %d\n", nameUpper, -100),
-        &pos
-    );
 
     TextAppend(
         buffer, TextFormat("#define %s_GLYPH_WIDTH %d\n", nameUpper, -100), &pos
+    );
+    TextAppend(
+        buffer, TextFormat("#define %s_GLYPH_HEIGHT %d\n", nameUpper, -100),
+        &pos
     );
 
     int count = obj->count;

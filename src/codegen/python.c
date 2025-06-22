@@ -35,6 +35,39 @@ char *GeneratePython(const GlyphObj *glyph) {
 bool getCode(const GlyphObj *glyph, char *buffer) {
 
     int pos = 0;
-    TextAppend(buffer, "# NOTE: Python Code Generation Not Available", &pos);
+    char *nameUpper = TextToUpper(glyph->name);
+    TextAppend(
+        buffer, TextFormat("%s_GLYPH_HEIGHT = %d\n", nameUpper, -100), &pos
+    );
+    TextAppend(
+        buffer, TextFormat("%s_GLYPH_WIDTH = %d\n", nameUpper, -100), &pos
+    );
+    int count = glyph->count;
+    TextAppend(
+        buffer, TextFormat("%s_GLYPH_COUNT = %d\n\n", nameUpper, count), &pos
+    );
+    TextAppend(buffer, TextFormat("%s_CODEPOINTS = [\n", nameUpper), &pos);
+
+    for (int i = 0; i < count; i++) {
+        int codepoint = glyph->glyphs[i]->value;
+        char *name = glyph->glyphs[i]->name;
+        TextAppend(
+            buffer, TextFormat("    0x%X,    #%s\n", codepoint, name), &pos
+        );
+    }
+
+    TextAppend(buffer, TextFormat("]\n\n%s_GLYPH_DATA = [\n", nameUpper), &pos);
+
+    for (int i = 0; i < count; i++) {
+        char *name = glyph->glyphs[i]->name;
+        uint8_t *code = glyph->glyphs[i]->bits;
+        TextAppend(buffer, "    [", &pos);
+        for (int j = 0; j < 8; j++) {
+            TextAppend(buffer, TextFormat("0x%X, ", code[j]), &pos);
+        }
+        TextAppend(buffer, TextFormat("],    #%s\n", name), &pos);
+    }
+    TextAppend(buffer, "]\n", &pos);
+
     return true;
 }

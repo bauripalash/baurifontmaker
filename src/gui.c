@@ -360,7 +360,18 @@ void fillExportOutput(Gui *ui, bool save) {
 
         case LANG_SEL_PYTHON: {
             states->export.buffer = GeneratePython(ui->glyph);
-            // TraceLog(LOG_WARNING, "Python Code Export Not Yet Available");
+            if (save) {
+                saveResult = SaveFileDialog(
+                    "Export File to Python Code", saveFilename, "*.py",
+                    "Python Code (*.py)"
+                );
+
+                if (saveResult) {
+                    if (!SaveFileText(saveFilename, states->export.buffer)) {
+                        TraceLog(LOG_ERROR, "Failed to save Python Code");
+                    }
+                }
+            }
             break;
         }
 
