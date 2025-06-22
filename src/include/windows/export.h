@@ -12,7 +12,7 @@
 #define TYPE_SEL_CODE      0
 #define TYPE_SEL_FONT      1
 
-#define LANG_SEL_STR       "C Header;Python<TODO>;Rust<TODO>"
+#define LANG_SEL_STR       "C Header;Python;Rust<TODO>"
 #define LANG_SEL_CHEADER   0
 #define LANG_SEL_PYTHON    1
 #define LANG_SEL_RUST      2

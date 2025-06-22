@@ -7,13 +7,21 @@
 <br>
 
 ### Features
-* Export as Python, Rust, C Code. `[TODO]`
+* Export as C Code, Python and Rust.
 * Export to multiple popular font formats `[TODO]`
 * Clean UI
 * Lightweight
 
 ### Screenshots
 <img align="center" src="assets/screenshot_1.png">
+
+### Progress:
+* [x] Export as C code
+* [x] Export as Python code
+* [] Export as Rust code
+* [x] Export as Glyph Bitmap Distribution Format (`.bdf`) font
+* [] Export as TrueType (`.ttf`) font
+* [] Export as OpenType (`.otf`) font
 
 
 ### License
