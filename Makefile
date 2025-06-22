@@ -21,7 +21,7 @@ run: build
 .PHONY: cmake_setup
 cmake_setup:
 	cmake -S . -B build
-	make cbuild
+	make build
 
 .PHONY: zbuild
 zbuild:
