@@ -3,7 +3,6 @@
 #include "../include/balloc.h"
 #include "../include/colors.h"
 #include "../include/glyph.h"
-#include "../include/widgets/filedialog.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -15,6 +14,7 @@ ExportState CreateExportState() {
     state.windowBounds = (Rectangle){0, 0, EXPORT_W_WIDTH, EXPORT_W_HEIGHT};
     state.buffer = NULL;
     state.saveBtnClicked = false;
+    state.copyBtnClicked = false;
     state.scrollOffset = (Vector2){0, 0};
     state.scrollView = (Rectangle){0};
     state.font = GuiGetFont();
@@ -35,10 +35,11 @@ void ClearExportBuffer(ExportState *state) {
         state->buffer = NULL;
     }
 }
-#define BTN_W   150
-#define BTN_H   30
-#define SPACING 2
-#define LINE_H  20
+#define BTN_W      50
+#define DROPDOWN_W 150
+#define BTN_H      30
+#define SPACING    2
+#define LINE_H     20
 
 // See
 // https://github.com/raysan5/rguilayout/blob/7749831c79107d4ecc69f5389ea41937e52f62f4/src/gui_window_codegen.h#L205
@@ -110,19 +111,21 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
         Rectangle typeSelectRect = {
             x,
             y,
-            200,
-            32,
+            DROPDOWN_W,
+            BTN_H,
         };
         // state->codeBtnClicked =
         //     GuiButton((Rectangle){x, y, BTN_W, BTN_H}, "Code");
 
-        x += EXPORT_W_MARGIN + 200;
+        x += EXPORT_W_MARGIN + DROPDOWN_W;
 
-        Rectangle dropDownRect = {x, y, 200, BTN_H};
+        Rectangle dropDownRect = {x, y, DROPDOWN_W, BTN_H};
 
-        x += EXPORT_W_MARGIN + 200;
+        x += EXPORT_W_MARGIN + DROPDOWN_W;
 
-        Rectangle saveBtnRect = {x, y, BTN_W, BTN_H};
+        Rectangle saveBtnRect = {x, y, DROPDOWN_W, BTN_H};
+        x += EXPORT_W_MARGIN + DROPDOWN_W;
+        Rectangle copyBtnRect = {x, y, BTN_W, BTN_H};
         x = winposX + EXPORT_W_MARGIN;
         y += BTN_H + EXPORT_W_MARGIN;
         Rectangle codeBoxRect = (Rectangle){
@@ -167,6 +170,13 @@ bool ExportWindow(ExportState *state, GlyphObj *obj) {
 
         state->saveBtnClicked =
             GuiButton(saveBtnRect, GuiIconText(ICON_FILE_SAVE, "Save File"));
+
+        if (state->typeSelectActive == TYPE_SEL_CODE ||
+            (state->typeSelectActive == TYPE_SEL_FONT &&
+             state->fontTypeActive == FONT_SEL_BDF)) {
+            state->copyBtnClicked =
+                GuiButton(copyBtnRect, GuiIconText(ICON_FILE_COPY, NULL));
+        }
     }
 
     return false;

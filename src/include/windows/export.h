@@ -27,6 +27,7 @@ typedef struct {
     Rectangle windowBounds;
     char *buffer;
     bool saveBtnClicked;
+    bool copyBtnClicked;
     Vector2 scrollOffset;
     Rectangle scrollView;
     Font font;

@@ -18,10 +18,10 @@
 ### Progress:
 * [x] Export as C code
 * [x] Export as Python code
-* [] Export as Rust code
+* [ ] Export as Rust code
 * [x] Export as Glyph Bitmap Distribution Format (`.bdf`) font
-* [] Export as TrueType (`.ttf`) font
-* [] Export as OpenType (`.otf`) font
+* [ ] Export as TrueType (`.ttf`) font
+* [ ] Export as OpenType (`.otf`) font
 
 
 ### License

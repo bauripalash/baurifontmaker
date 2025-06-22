@@ -322,7 +322,7 @@ void handleInfoEditWindow(Gui *ui) {
     }
 }
 
-void fillExportOutput(Gui *ui, bool save) {
+void fillExportOutput(Gui *ui, bool save, bool copy) {
     UiStates *states = ui->states;
     int type = states->export.typeSelectActive;
     int subtype = -1;
@@ -355,6 +355,7 @@ void fillExportOutput(Gui *ui, bool save) {
                     }
                 }
             }
+
             break;
         }
 
@@ -381,12 +382,18 @@ void fillExportOutput(Gui *ui, bool save) {
             break;
         }
         }
+
+        if (copy) {
+            SetClipboardText(states->export.buffer);
+        }
     } else if (type == TYPE_SEL_FONT) {
         subtype = states->export.fontTypeActive;
         switch (subtype) {
         case FONT_SEL_BDF: {
             states->export.buffer = GenerateBDFFont(ui->glyph);
-            // TraceLog(LOG_WARNING, "BDF Font Export Not Yet Available");
+            if (copy) {
+                SetClipboardText(states->export.buffer);
+            }
             break;
         }
 
@@ -416,11 +423,18 @@ void handleExportWindow(Gui *ui) {
     if (ui->states->export.windowActive) {
         bool result = ExportWindow(&ui->states->export, ui->glyph);
 
-        fillExportOutput(ui, ui->states->export.saveBtnClicked);
+        fillExportOutput(
+            ui, ui->states->export.saveBtnClicked,
+            ui->states->export.copyBtnClicked
+        );
 
         if (ui->states->export.saveBtnClicked) {
             ui->states->export.saveBtnClicked = false;
             ui->states->export.windowActive = false;
+        }
+
+        if (ui->states->export.copyBtnClicked) {
+            ui->states->export.copyBtnClicked = false;
         }
     } else {
         ClearExportBuffer(&ui->states->export);
@@ -500,11 +514,12 @@ void Layout(Gui *ui) {
 
     GuiPanel((Rectangle){0, 0, ui->winWidth, ui->winHeight}, NULL);
     Toolbar(&ui->states->toolbar);
-    Canvas(&ui->states->canvas, ui->conf, ui->currentItem);
     ItemSelector(&ui->states->itemSelector, ui->glyph);
 
     handleItemSelector(ui);
     StatusBarLayout(ui);
+
+    Canvas(&ui->states->canvas, ui->conf, ui->currentItem);
 
     GuiUnlock();
 
